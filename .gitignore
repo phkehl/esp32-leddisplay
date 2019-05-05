@@ -1,0 +1,7 @@
+build
+esp-idf
+xtensa-esp32-elf
+sdkconfig.old
+sdkconfig
+*~
+

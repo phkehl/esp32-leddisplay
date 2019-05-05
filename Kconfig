@@ -1,0 +1,85 @@
+menu "leddisplay configuration"
+
+config LEDDISPLAY_WIDTH
+    int "matrix width"
+    default 64
+
+config LEDDISPLAY_HEIGHT
+    int "matrix height"
+    default 32
+
+config LEDDISPLAY_ROWS_IN_PARALLEL
+    int "rows in parallel"
+    default 2
+    help
+        not sure what this is; something to do with this 1/4, 1/8, 1/16 or 1/32 row scan?
+
+config LEDDISPLAY_CORR_LUMINANCE
+       bool "correct luminance (or so..)"
+       default y
+
+config LEDDISPLAY_R1_GPIO
+    int "GPIO for the R1 signal"
+    default 2
+
+config LEDDISPLAY_G1_GPIO
+    int "GPIO for the G1 signal"
+    default 15
+
+config LEDDISPLAY_B1_GPIO
+    int "GPIO for the B1 signal"
+    default 4
+
+config LEDDISPLAY_R2_GPIO
+    int "GPIO for the R2 signal"
+    default 16
+
+config LEDDISPLAY_G2_GPIO
+    int "GPIO for the G2 signal"
+    default 27
+
+config LEDDISPLAY_B2_GPIO
+    int "GPIO for the B2 signal"
+    default 17
+
+config LEDDISPLAY_A_GPIO
+    int "GPIO for the A signal"
+    default 5
+
+config LEDDISPLAY_B_GPIO
+    int "GPIO for the B signal"
+    default 18
+
+config LEDDISPLAY_C_GPIO
+    int "GPIO for the C signal"
+    default 19
+
+config LEDDISPLAY_D_GPIO
+    int "GPIO for the D signal"
+    default 21
+
+config LEDDISPLAY_E_GPIO
+    int "GPIO for the E signal"
+    default -1
+
+config LEDDISPLAY_LAT_GPIO
+    int "GPIO for the LAT signal"
+    default 26
+
+config LEDDISPLAY_OE_GPIO
+    int "GPIO for the OE signal"
+    default 25
+
+config LEDDISPLAY_CLK_GPIO
+    int "GPIO for the CLK signal"
+    default 22
+
+config LEDDISPLAY_PRESERVE_RAM_SIZE
+    int "keep this much (DMA) RAM free"
+    default 64000
+
+config LEDDISPLAY_MIN_FRAME_RATE
+    int "minimum frame rate"
+    default 150
+
+endmenu
