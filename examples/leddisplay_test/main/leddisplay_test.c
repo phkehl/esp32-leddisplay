@@ -90,6 +90,7 @@ static void sLeddisplayTestTask(void *pParam)
         leddisplay_init();
         sDumpMemInfo();
 
+
         /* ***** pixel based API ***************************************************************** */
 
         INFO("fill (pixel)");
@@ -649,7 +650,7 @@ static void sLedfxPlasma(leddisplay_frame_t *pFrame, const bool init, float *r0)
 
     if (init)
     {
-        *r0 = 128000.0f; // pallete shift, FIXME: 128000, obviously.. :-/
+        *r0 = (float)(esp_random() % 128000);
     }
 
     for (uint16_t y = 0; y < CONFIG_LEDDISPLAY_HEIGHT; y++)
