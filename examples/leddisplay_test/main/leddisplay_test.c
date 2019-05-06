@@ -92,52 +92,54 @@ static void sLeddisplayTestTask(void *pParam)
 
         /* ***** pixel based API ***************************************************************** */
 
-        INFO("fill red (pixel)");
-        leddisplay_pixel_fill_rgb(255, 0, 0);
-        leddisplay_pixel_update(0);
-        osSleep(10 * delay);
+        INFO("fill (pixel)");
+        for (int which = 1; which <= 7; which++)
+        {
+            DEBUG("which=%d (%c%c%c)", which,
+                (which & 0x1) != 0 ? 'R' : '.',
+                (which & 0x2) != 0 ? 'G' : '.',
+                (which & 0x4) != 0 ? 'B' : '.');
+            for (uint16_t x = 0; x < CONFIG_LEDDISPLAY_WIDTH; x++)
+            {
+                for (uint16_t y = 0; y < CONFIG_LEDDISPLAY_HEIGHT; y++)
+                {
+                    leddisplay_pixel_xy_rgb(x, y,
+                        (which & 0x1) != 0 ? 255 : 0,
+                        (which & 0x2) != 0 ? 255 : 0,
+                        (which & 0x4) != 0 ? 255 : 0);
+                }
+            }
+            leddisplay_pixel_update(0);
+            osSleep(20 * delay);
+        }
 
         // -----------------------------------------------------------------------------------------
 
-        INFO("fill blue (pixel)");
-        leddisplay_pixel_fill_rgb(0, 255, 0);
-        leddisplay_pixel_update(0);
-        osSleep(10 * delay);
-
-        // -----------------------------------------------------------------------------------------
-
-        INFO("fill green (pixel)");
-        leddisplay_pixel_fill_rgb(0, 0, 255);
-        leddisplay_pixel_update(0);
-        osSleep(10 * delay);
-
-        // -----------------------------------------------------------------------------------------
-
-        INFO("fill red+green (pixel)");
-        leddisplay_pixel_fill_rgb(255, 255, 0);
-        leddisplay_pixel_update(0);
-        osSleep(10 * delay);
-
-        // -----------------------------------------------------------------------------------------
-
-        INFO("fill red+blue (pixel)");
-        leddisplay_pixel_fill_rgb(255, 0, 255);
-        leddisplay_pixel_update(0);
-        osSleep(10 * delay);
-
-        // -----------------------------------------------------------------------------------------
-
-        INFO("fill green+blue (pixel)");
-        leddisplay_pixel_fill_rgb(0, 255, 255);
-        leddisplay_pixel_update(0);
-        osSleep(10 * delay);
-
-        // -----------------------------------------------------------------------------------------
-
-        INFO("fill red+green+blue (pixel)");
-        leddisplay_pixel_fill_rgb(255, 255, 255);
-        leddisplay_pixel_update(0);
-        osSleep(10 * delay);
+        INFO("fade (pixel)");
+        for (int which = 1; which <= 7; which++)
+        {
+            DEBUG("which=%d (%c%c%c)", which,
+                (which & 0x1) != 0 ? 'R' : '.',
+                (which & 0x2) != 0 ? 'G' : '.',
+                (which & 0x4) != 0 ? 'B' : '.');
+            const float maxDist = sqrtf( (float)( (CONFIG_LEDDISPLAY_WIDTH - 1)  * (CONFIG_LEDDISPLAY_WIDTH - 1)) +
+                                         (float)( (CONFIG_LEDDISPLAY_HEIGHT - 1) * (CONFIG_LEDDISPLAY_HEIGHT - 1)) );
+            for (uint16_t x = 0; x < CONFIG_LEDDISPLAY_WIDTH; x++)
+            {
+                for (uint16_t y = 0; y < CONFIG_LEDDISPLAY_HEIGHT; y++)
+                {
+                    const float dist = sqrtf( (float)(x * x) + (float)(y * y) );
+                    const float r = floorf( 1.0f + (254.0f * dist / maxDist) + 0.5 );
+                    const uint8_t rgb = r;
+                    leddisplay_pixel_xy_rgb(x, y,
+                        (which & 0x1) != 0 ? rgb : 0,
+                        (which & 0x2) != 0 ? rgb : 0,
+                        (which & 0x4) != 0 ? rgb : 0);
+                }
+            }
+            leddisplay_pixel_update(0);
+            osSleep(20 * delay);
+        }
 
         // -----------------------------------------------------------------------------------------
 
@@ -284,52 +286,90 @@ static void sLeddisplayTestTask(void *pParam)
 
         /* ***** frame based API ***************************************************************** */
 
-        INFO("fill red (frame)");
-        leddisplay_frame_fill_rgb(&sDispFrame, 255, 0, 0);
-        leddisplay_frame_update(&sDispFrame);
-        osSleep(10 * delay);
+        INFO("fill (frame)");
+        for (int which = 1; which <= 7; which++)
+        {
+            DEBUG("which=%d (%c%c%c)", which,
+                (which & 0x1) != 0 ? 'R' : '.',
+                (which & 0x2) != 0 ? 'G' : '.',
+                (which & 0x4) != 0 ? 'B' : '.');
+            for (uint16_t x = 0; x < CONFIG_LEDDISPLAY_WIDTH; x++)
+            {
+                for (uint16_t y = 0; y < CONFIG_LEDDISPLAY_HEIGHT; y++)
+                {
+                    leddisplay_frame_xy_rgb(&sDispFrame, x, y,
+                        (which & 0x1) != 0 ? 255 : 0,
+                        (which & 0x2) != 0 ? 255 : 0,
+                        (which & 0x4) != 0 ? 255 : 0);
+                }
+            }
+            leddisplay_frame_update(&sDispFrame);
+            osSleep(20 * delay);
+        }
 
         // -----------------------------------------------------------------------------------------
 
-        INFO("fill blue (frame)");
-        leddisplay_frame_fill_rgb(&sDispFrame, 0, 255, 0);
-        leddisplay_frame_update(&sDispFrame);
-        osSleep(10 * delay);
+        INFO("fade (frame)");
+        for (int which = 1; which <= 7; which++)
+        {
+            DEBUG("which=%d (%c%c%c)", which,
+                (which & 0x1) != 0 ? 'R' : '.',
+                (which & 0x2) != 0 ? 'G' : '.',
+                (which & 0x4) != 0 ? 'B' : '.');
+            const float maxDist = sqrtf( (float)( (CONFIG_LEDDISPLAY_WIDTH - 1)  * (CONFIG_LEDDISPLAY_WIDTH - 1)) +
+                                         (float)( (CONFIG_LEDDISPLAY_HEIGHT - 1) * (CONFIG_LEDDISPLAY_HEIGHT - 1)) );
+            for (uint16_t x = 0; x < CONFIG_LEDDISPLAY_WIDTH; x++)
+            {
+                for (uint16_t y = 0; y < CONFIG_LEDDISPLAY_HEIGHT; y++)
+                {
+                    const float dist = sqrtf( (float)(x * x) + (float)(y * y) );
+                    const float r = floorf( 1.0f + (254.0f * dist / maxDist) + 0.5 );
+                    const uint8_t rgb = r;
+                    leddisplay_frame_xy_rgb(&sDispFrame, x, y,
+                        (which & 0x1) != 0 ? rgb : 0,
+                        (which & 0x2) != 0 ? rgb : 0,
+                        (which & 0x4) != 0 ? rgb : 0);
+                }
+            }
+            leddisplay_frame_update(&sDispFrame);
+            osSleep(20 * delay);
+        }
 
         // -----------------------------------------------------------------------------------------
 
-        INFO("fill green (frame)");
-        leddisplay_frame_fill_rgb(&sDispFrame, 0, 0, 255);
-        leddisplay_frame_update(&sDispFrame);
-        osSleep(10 * delay);
-
-        // -----------------------------------------------------------------------------------------
-
-        INFO("fill red+green (frame)");
-        leddisplay_frame_fill_rgb(&sDispFrame, 255, 255, 0);
-        leddisplay_frame_update(&sDispFrame);
-        osSleep(10 * delay);
-
-        // -----------------------------------------------------------------------------------------
-
-        INFO("fill red+blue (frame)");
-        leddisplay_frame_fill_rgb(&sDispFrame, 255, 0, 255);
-        leddisplay_frame_update(&sDispFrame);
-        osSleep(10 * delay);
-
-        // -----------------------------------------------------------------------------------------
-
-        INFO("fill green+blue (frame)");
-        leddisplay_frame_fill_rgb(&sDispFrame, 0, 255, 255);
-        leddisplay_frame_update(&sDispFrame);
-        osSleep(10 * delay);
-
-        // -----------------------------------------------------------------------------------------
-
-        INFO("fill red+green+blue (frame)");
-        leddisplay_frame_fill_rgb(&sDispFrame, 255, 255, 255);
-        leddisplay_frame_update(&sDispFrame);
-        osSleep(10 * delay);
+        INFO("fade colour and brightness (frame)");
+        {
+            const int oldBrightness = leddisplay_get_brightness();
+            const float maxDist = sqrtf( (float)( (CONFIG_LEDDISPLAY_WIDTH - 1)  * (CONFIG_LEDDISPLAY_WIDTH - 1)) +
+                (float)( (CONFIG_LEDDISPLAY_HEIGHT - 1) * (CONFIG_LEDDISPLAY_HEIGHT - 1)) );
+            for (int which = 1; which <= 7; which++)
+            {
+                DEBUG("which=%d (%c%c%c)", which,
+                    (which & 0x1) != 0 ? 'R' : '.',
+                    (which & 0x2) != 0 ? 'G' : '.',
+                    (which & 0x4) != 0 ? 'B' : '.');
+                for (int brightness = 1; brightness <= CONFIG_LEDDISPLAY_WIDTH; brightness++)
+                {
+                    leddisplay_set_brightness(brightness);
+                    for (uint16_t x = 0; x < CONFIG_LEDDISPLAY_WIDTH; x++)
+                    {
+                        for (uint16_t y = 0; y < CONFIG_LEDDISPLAY_HEIGHT; y++)
+                        {
+                            const float dist = sqrtf( (float)(x * x) + (float)(y * y) );
+                            const float r = floorf( 1.0f + (254.0f * dist / maxDist) + 0.5 );
+                            const uint8_t rgb = r;
+                            leddisplay_frame_xy_rgb(&sDispFrame, x, y,
+                                (which & 0x1) != 0 ? rgb : 0,
+                                (which & 0x2) != 0 ? rgb : 0,
+                                (which & 0x4) != 0 ? rgb : 0);
+                        }
+                    }
+                    leddisplay_frame_update(&sDispFrame);
+                    osSleep(delay / 5);
+                }
+            }
+            leddisplay_set_brightness(oldBrightness);
+        }
 
         // -----------------------------------------------------------------------------------------
 
@@ -473,6 +513,44 @@ static void sLeddisplayTestTask(void *pParam)
             leddisplay_set_brightness(oldBrightness);
         }
 
+        // -----------------------------------------------------------------------------------------
+
+        INFO("random fill (frame)");
+        {
+            int n = 200;
+            while (n--)
+            {
+                esp_fill_random(&sDispFrame, sizeof(sDispFrame));
+                leddisplay_frame_update(&sDispFrame);
+                osSleep(delay / 10);
+                n--;
+            }
+        }
+
+
+        /* ***** other ************************************************************************** */
+
+        INFO("test frame refresh rate");
+        for (int dummy = 0; dummy < 5; dummy++)
+        {
+            int n = 100;
+            sTicTocInit(0, "maxrefresh");
+            while (n > 0)
+            {
+                sTic(0);
+                const uint8_t rgb = (n % 2) == 0 ? 50 : 100;
+                // assuming this is faster than the frame rate..
+                leddisplay_frame_fill_rgb(&sDispFrame, rgb, rgb, rgb);
+                // ..and this will block for a moment
+                leddisplay_frame_update(&sDispFrame);
+                sToc(0);
+                n--;
+            }
+            leddisplay_frame_fill_rgb(&sDispFrame, 0, 0, 0);
+            leddisplay_frame_update(&sDispFrame);
+            sTicTocStats(0);
+        }
+
 
         /* ***** shutdown display *************************************************************** */
 
@@ -560,7 +638,6 @@ static void sLedfxConcentricHueFlow(leddisplay_frame_t *pFrame, const bool init,
 // 2009 Ken Corey, 2008 Windell H. Oskay \todo find original reference for this
 static inline float sDist(const float a, const float b, const float c, const float d)
 {
-    // based on: see header file
     const float cma = c - a;
     const float dmb = d - b;
     return sqrtf( (cma * cma) + (dmb * dmb) );

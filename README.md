@@ -8,8 +8,8 @@ to drive "dumb" LED displays (a.k.a. "Px displays").
 See [leddisplay.h](include/leddisplay.h) for the API.
 
 This code is meant for directly connecting the ESP32 to a display (possibly via
-a level shifter). The pinout configuration is available via the sdkconfig ("make
-menuconfig"). See [Kconfig](Kconfig) for the defaults.
+a level shifter or buffer). The pinout configuration is available via the
+sdkconfig ("make menuconfig"). See [Kconfig](Kconfig) for the defaults.
 
 See [leddisplay.c](src/leddisplay.c) for more information on the code, for
 references to the origin of the concept and code, and for copyright and license
@@ -42,9 +42,9 @@ git submodule add -b master https://github.com/phkehl/esp32-leddisplay.git compo
 - This has been tested with a 64x32 1/16 scan type display. It may or may not
   work with other configurations.
 
-- The code is relatively slow, in particular the pixel based API (`leddisplay_xy_rgb()`),
- so perhaps increase the CPU clock in sdkconfig (e.g. `CONFIG_ESP32_DEFAULT_CPU_FREQ_240=y`,
- `CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ=240`).
+- The code is relatively slow, in particular the pixel based API (`leddisplay_pixel_xy_rgb()`),
+  so perhaps increase the CPU clock in sdkconfig (e.g. `CONFIG_ESP32_DEFAULT_CPU_FREQ_240=y`,
+  `CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ=240`).
 
 ## See also
 

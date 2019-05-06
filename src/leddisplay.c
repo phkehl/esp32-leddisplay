@@ -184,7 +184,7 @@
 
 /* *********************************************************************************************** */
 
-#define I2S_CLOCK_SPEED           (20000000UL) // possible values: 13333334, 16000000, 20000000, 26666667
+#define I2S_CLOCK_SPEED           CONFIG_LEDDISPLAY_I2S_FREQ
 #define NUM_FRAME_BUFFERS         2
 #define OE_OFF_CLKS_AFTER_LATCH   1
 #define COLOR_DEPTH_BITS          8

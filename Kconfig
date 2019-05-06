@@ -14,6 +14,20 @@ config LEDDISPLAY_ROWS_IN_PARALLEL
     help
         not sure what this is; something to do with this 1/4, 1/8, 1/16 or 1/32 row scan?
 
+config LEDDISPLAY_I2S_FREQ
+    int "I2S frequency [Hz] (see help!)"
+    default 20000000
+    help
+        possible values: 13333334, 16000000, 20000000, 26666667
+
+config LEDDISPLAY_PRESERVE_RAM_SIZE
+    int "keep this much (DMA) RAM free"
+    default 64000
+
+config LEDDISPLAY_MIN_FRAME_RATE
+    int "minimum frame refresh rate"
+    default 50
+
 config LEDDISPLAY_CORR_LUMINANCE
        bool "correct luminance (or so..)"
        default y
@@ -73,13 +87,5 @@ config LEDDISPLAY_OE_GPIO
 config LEDDISPLAY_CLK_GPIO
     int "GPIO for the CLK signal"
     default 22
-
-config LEDDISPLAY_PRESERVE_RAM_SIZE
-    int "keep this much (DMA) RAM free"
-    default 64000
-
-config LEDDISPLAY_MIN_FRAME_RATE
-    int "minimum frame rate"
-    default 150
 
 endmenu
