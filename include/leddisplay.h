@@ -158,9 +158,9 @@ void leddisplay_pixel_update(int block);
 //! frame type
 typedef union leddisplay_frame_u
 {
-    //! access RGB by coordinates
+    //! access RGB pixel by coordinates
     uint8_t yx[CONFIG_LEDDISPLAY_HEIGHT][CONFIG_LEDDISPLAY_WIDTH][3];
-    //! access RGVB by index
+    //! access RGB pixel by index
     uint8_t ix[CONFIG_LEDDISPLAY_HEIGHT * CONFIG_LEDDISPLAY_WIDTH][3];
     //! raw frame data
     uint8_t raw[CONFIG_LEDDISPLAY_HEIGHT * CONFIG_LEDDISPLAY_WIDTH * 3];
