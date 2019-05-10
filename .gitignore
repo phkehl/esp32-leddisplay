@@ -4,4 +4,4 @@ xtensa-esp32-elf
 sdkconfig.old
 sdkconfig
 *~
-
+env.sh

@@ -24,6 +24,7 @@
 
 #include <leddisplay.h>
 
+#include "mon.h"
 #include "nyan_64x32.h"
 
 /* *********************************************************************************************** */
@@ -60,6 +61,9 @@ static void sDumpMemInfo(void);
 
 void app_main(void)
 {
+    monStart();
+    //monSetPeriod(1000);
+
     osSleep(2000);
     printf("\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n");
 
@@ -87,7 +91,12 @@ static void sLeddisplayTestTask(void *pParam)
 
         INFO("init display");
         sDumpMemInfo();
-        leddisplay_init();
+        if (leddisplay_init()!= ESP_OK)
+        {
+            ERROR(":-(");
+            osSleep(2000);
+            continue;
+        }
         sDumpMemInfo();
 
 
