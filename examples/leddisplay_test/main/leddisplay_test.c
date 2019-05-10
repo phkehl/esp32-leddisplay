@@ -109,9 +109,9 @@ static void sLeddisplayTestTask(void *pParam)
                 (which & 0x1) != 0 ? 'R' : '.',
                 (which & 0x2) != 0 ? 'G' : '.',
                 (which & 0x4) != 0 ? 'B' : '.');
-            for (uint16_t x = 0; x < CONFIG_LEDDISPLAY_WIDTH; x++)
+            for (uint16_t x = 0; x < LEDDISPLAY_WIDTH; x++)
             {
-                for (uint16_t y = 0; y < CONFIG_LEDDISPLAY_HEIGHT; y++)
+                for (uint16_t y = 0; y < LEDDISPLAY_HEIGHT; y++)
                 {
                     leddisplay_pixel_xy_rgb(x, y,
                         (which & 0x1) != 0 ? 255 : 0,
@@ -132,11 +132,11 @@ static void sLeddisplayTestTask(void *pParam)
                 (which & 0x1) != 0 ? 'R' : '.',
                 (which & 0x2) != 0 ? 'G' : '.',
                 (which & 0x4) != 0 ? 'B' : '.');
-            const float maxDist = sqrtf( (float)( (CONFIG_LEDDISPLAY_WIDTH - 1)  * (CONFIG_LEDDISPLAY_WIDTH - 1)) +
-                                         (float)( (CONFIG_LEDDISPLAY_HEIGHT - 1) * (CONFIG_LEDDISPLAY_HEIGHT - 1)) );
-            for (uint16_t x = 0; x < CONFIG_LEDDISPLAY_WIDTH; x++)
+            const float maxDist = sqrtf( (float)( (LEDDISPLAY_WIDTH - 1)  * (LEDDISPLAY_WIDTH - 1)) +
+                                         (float)( (LEDDISPLAY_HEIGHT - 1) * (LEDDISPLAY_HEIGHT - 1)) );
+            for (uint16_t x = 0; x < LEDDISPLAY_WIDTH; x++)
             {
-                for (uint16_t y = 0; y < CONFIG_LEDDISPLAY_HEIGHT; y++)
+                for (uint16_t y = 0; y < LEDDISPLAY_HEIGHT; y++)
                 {
                     const float dist = sqrtf( (float)(x * x) + (float)(y * y) );
                     const float r = floorf( 1.0f + (254.0f * dist / maxDist) + 0.5 );
@@ -174,9 +174,9 @@ static void sLeddisplayTestTask(void *pParam)
                 uint8_t red = 0, green = 0, blue = 0;
                 sHsvToRgb(hue, 255, 255, &red, &green, &blue);
                 sTic(0);
-                for (uint16_t y = 0; y < CONFIG_LEDDISPLAY_HEIGHT; y++)
+                for (uint16_t y = 0; y < LEDDISPLAY_HEIGHT; y++)
                 {
-                    for (uint16_t x = 0; x < CONFIG_LEDDISPLAY_WIDTH; x++)
+                    for (uint16_t x = 0; x < LEDDISPLAY_WIDTH; x++)
                     {
                         leddisplay_pixel_xy_rgb(x, y, red, green, blue);
                     }
@@ -264,7 +264,7 @@ static void sLeddisplayTestTask(void *pParam)
         {
             const int oldBrightness = leddisplay_get_brightness();
             const int delta = 2;
-            int n = CONFIG_LEDDISPLAY_WIDTH * 2 / delta;
+            int n = LEDDISPLAY_WIDTH * 2 / delta;
             int aniFrame = 0;
             int brightness = 0;
             int dir = delta;
@@ -278,7 +278,7 @@ static void sLeddisplayTestTask(void *pParam)
                 aniFrame %= 12;
 
                 brightness += dir;
-                if (brightness > CONFIG_LEDDISPLAY_WIDTH)
+                if (brightness > LEDDISPLAY_WIDTH)
                 {
                     dir = -delta;
                     brightness -= 2 * delta;
@@ -303,9 +303,9 @@ static void sLeddisplayTestTask(void *pParam)
                 (which & 0x1) != 0 ? 'R' : '.',
                 (which & 0x2) != 0 ? 'G' : '.',
                 (which & 0x4) != 0 ? 'B' : '.');
-            for (uint16_t x = 0; x < CONFIG_LEDDISPLAY_WIDTH; x++)
+            for (uint16_t x = 0; x < LEDDISPLAY_WIDTH; x++)
             {
-                for (uint16_t y = 0; y < CONFIG_LEDDISPLAY_HEIGHT; y++)
+                for (uint16_t y = 0; y < LEDDISPLAY_HEIGHT; y++)
                 {
                     leddisplay_frame_xy_rgb(&sDispFrame, x, y,
                         (which & 0x1) != 0 ? 255 : 0,
@@ -326,11 +326,11 @@ static void sLeddisplayTestTask(void *pParam)
                 (which & 0x1) != 0 ? 'R' : '.',
                 (which & 0x2) != 0 ? 'G' : '.',
                 (which & 0x4) != 0 ? 'B' : '.');
-            const float maxDist = sqrtf( (float)( (CONFIG_LEDDISPLAY_WIDTH - 1)  * (CONFIG_LEDDISPLAY_WIDTH - 1)) +
-                                         (float)( (CONFIG_LEDDISPLAY_HEIGHT - 1) * (CONFIG_LEDDISPLAY_HEIGHT - 1)) );
-            for (uint16_t x = 0; x < CONFIG_LEDDISPLAY_WIDTH; x++)
+            const float maxDist = sqrtf( (float)( (LEDDISPLAY_WIDTH - 1)  * (LEDDISPLAY_WIDTH - 1)) +
+                                         (float)( (LEDDISPLAY_HEIGHT - 1) * (LEDDISPLAY_HEIGHT - 1)) );
+            for (uint16_t x = 0; x < LEDDISPLAY_WIDTH; x++)
             {
-                for (uint16_t y = 0; y < CONFIG_LEDDISPLAY_HEIGHT; y++)
+                for (uint16_t y = 0; y < LEDDISPLAY_HEIGHT; y++)
                 {
                     const float dist = sqrtf( (float)(x * x) + (float)(y * y) );
                     const float r = floorf( 1.0f + (254.0f * dist / maxDist) + 0.5 );
@@ -350,20 +350,20 @@ static void sLeddisplayTestTask(void *pParam)
         INFO("fade colour and brightness (frame)");
         {
             const int oldBrightness = leddisplay_get_brightness();
-            const float maxDist = sqrtf( (float)( (CONFIG_LEDDISPLAY_WIDTH - 1)  * (CONFIG_LEDDISPLAY_WIDTH - 1)) +
-                (float)( (CONFIG_LEDDISPLAY_HEIGHT - 1) * (CONFIG_LEDDISPLAY_HEIGHT - 1)) );
+            const float maxDist = sqrtf( (float)( (LEDDISPLAY_WIDTH - 1)  * (LEDDISPLAY_WIDTH - 1)) +
+                (float)( (LEDDISPLAY_HEIGHT - 1) * (LEDDISPLAY_HEIGHT - 1)) );
             for (int which = 1; which <= 7; which++)
             {
                 DEBUG("which=%d (%c%c%c)", which,
                     (which & 0x1) != 0 ? 'R' : '.',
                     (which & 0x2) != 0 ? 'G' : '.',
                     (which & 0x4) != 0 ? 'B' : '.');
-                for (int brightness = 1; brightness <= CONFIG_LEDDISPLAY_WIDTH; brightness++)
+                for (int brightness = 1; brightness <= LEDDISPLAY_WIDTH; brightness++)
                 {
                     leddisplay_set_brightness(brightness);
-                    for (uint16_t x = 0; x < CONFIG_LEDDISPLAY_WIDTH; x++)
+                    for (uint16_t x = 0; x < LEDDISPLAY_WIDTH; x++)
                     {
-                        for (uint16_t y = 0; y < CONFIG_LEDDISPLAY_HEIGHT; y++)
+                        for (uint16_t y = 0; y < LEDDISPLAY_HEIGHT; y++)
                         {
                             const float dist = sqrtf( (float)(x * x) + (float)(y * y) );
                             const float r = floorf( 1.0f + (254.0f * dist / maxDist) + 0.5 );
@@ -404,9 +404,9 @@ static void sLeddisplayTestTask(void *pParam)
                 uint8_t red = 0, green = 0, blue = 0;
                 sHsvToRgb(hue, 255, 255, &red, &green, &blue);
                 sTic(0);
-                for (uint16_t y = 0; y < CONFIG_LEDDISPLAY_HEIGHT; y++)
+                for (uint16_t y = 0; y < LEDDISPLAY_HEIGHT; y++)
                 {
-                    for (uint16_t x = 0; x < CONFIG_LEDDISPLAY_WIDTH; x++)
+                    for (uint16_t x = 0; x < LEDDISPLAY_WIDTH; x++)
                     {
                         leddisplay_frame_xy_rgb(&sDispFrame, x, y, red, green, blue);
                     }
@@ -494,7 +494,7 @@ static void sLeddisplayTestTask(void *pParam)
         {
             const int oldBrightness = leddisplay_get_brightness();
             const int delta = 2;
-            int n = CONFIG_LEDDISPLAY_WIDTH * 2 / delta;
+            int n = LEDDISPLAY_WIDTH * 2 / delta;
             int aniFrame = 0;
             int brightness = 0;
             int dir = delta;
@@ -508,7 +508,7 @@ static void sLeddisplayTestTask(void *pParam)
                 aniFrame %= 12;
 
                 brightness += dir;
-                if (brightness > CONFIG_LEDDISPLAY_WIDTH)
+                if (brightness > LEDDISPLAY_WIDTH)
                 {
                     dir = -delta;
                     brightness -= 2 * delta;
@@ -605,8 +605,8 @@ static void sLedfxConcentricHueFlow(leddisplay_frame_t *pFrame, const bool init,
         (*r0) += step;
     }
 
-    const int16_t x0 = CONFIG_LEDDISPLAY_WIDTH / 2;
-    const int16_t y0 = CONFIG_LEDDISPLAY_HEIGHT / 2;
+    const int16_t x0 = LEDDISPLAY_WIDTH / 2;
+    const int16_t y0 = LEDDISPLAY_HEIGHT / 2;
     const int16_t hueMax = 256/2;
     const uint8_t sat = 255;
     const uint8_t val = 255;
@@ -662,9 +662,9 @@ static void sLedfxPlasma(leddisplay_frame_t *pFrame, const bool init, float *r0)
         *r0 = (float)(esp_random() % 128000);
     }
 
-    for (uint16_t y = 0; y < CONFIG_LEDDISPLAY_HEIGHT; y++)
+    for (uint16_t y = 0; y < LEDDISPLAY_HEIGHT; y++)
     {
-        for (uint16_t x = 0; x < CONFIG_LEDDISPLAY_WIDTH; x++)
+        for (uint16_t x = 0; x < LEDDISPLAY_WIDTH; x++)
         {
             // based on source: see progPlasma() docu
             const float value =
@@ -708,8 +708,8 @@ static void sAnimNyan(leddisplay_frame_t *p_frame, uint32_t delay, int frame)
     // clear display
     leddisplay_pixel_fill_rgb(0, 0, 0);
 
-    const uint16_t x_max = CONFIG_LEDDISPLAY_WIDTH  < 64 ? CONFIG_LEDDISPLAY_WIDTH  : 64;
-    const uint16_t y_max = CONFIG_LEDDISPLAY_HEIGHT < 32 ? CONFIG_LEDDISPLAY_HEIGHT : 32;
+    const uint16_t x_max = LEDDISPLAY_WIDTH  < 64 ? LEDDISPLAY_WIDTH  : 64;
+    const uint16_t y_max = LEDDISPLAY_HEIGHT < 32 ? LEDDISPLAY_HEIGHT : 32;
 
     // which frames to play?
     int startFrame = (frame < 0) || (frame >= nFrames) ? 0             : frame;

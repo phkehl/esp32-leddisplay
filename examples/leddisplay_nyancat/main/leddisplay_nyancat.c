@@ -128,8 +128,8 @@ static void sLeddisplayTestTask(void *pParam)
         INFO("animation + brightness (frame)");
         {
             const int oldBrightness = leddisplay_get_brightness();
-            const int delta = 2;
-            int n = CONFIG_LEDDISPLAY_WIDTH * 2 / delta;
+            const int delta = 1;
+            int n = LEDDISPLAY_WIDTH * 2 / delta;
             int aniFrame = 0;
             int brightness = 0;
             int dir = delta;
@@ -143,7 +143,7 @@ static void sLeddisplayTestTask(void *pParam)
                 aniFrame %= 12;
 
                 brightness += dir;
-                if (brightness > CONFIG_LEDDISPLAY_WIDTH)
+                if (brightness > LEDDISPLAY_WIDTH)
                 {
                     dir = -delta;
                     brightness -= 2 * delta;
@@ -189,8 +189,8 @@ static void sAnimNyan(leddisplay_frame_t *p_frame, uint32_t delay, int frame)
     // clear display
     leddisplay_pixel_fill_rgb(0, 0, 0);
 
-    const uint16_t x_max = CONFIG_LEDDISPLAY_WIDTH  < 64 ? CONFIG_LEDDISPLAY_WIDTH  : 64;
-    const uint16_t y_max = CONFIG_LEDDISPLAY_HEIGHT < 32 ? CONFIG_LEDDISPLAY_HEIGHT : 32;
+    const uint16_t x_max = LEDDISPLAY_WIDTH  < 64 ? LEDDISPLAY_WIDTH  : 64;
+    const uint16_t y_max = LEDDISPLAY_HEIGHT < 32 ? LEDDISPLAY_HEIGHT : 32;
 
     // which frames to play?
     int startFrame = (frame < 0) || (frame >= nFrames) ? 0             : frame;

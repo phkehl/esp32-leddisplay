@@ -37,6 +37,10 @@ cd /path/to/your/project
 git submodule add -b master https://github.com/phkehl/esp32-leddisplay.git components/leddisplay
 ```
 
+## Configuration
+
+Configuration is available in `make menuconfig` in *Component config* -> *LED Display*.
+
 ## Notes
 
 - This has been tested with a 64x32 1/16 scan type display. It may or may not

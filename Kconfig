@@ -1,27 +1,58 @@
-menu "leddisplay configuration"
+menu "LED Display"
 
-config LEDDISPLAY_WIDTH
-    int "matrix width"
-    default 64
-
-config LEDDISPLAY_HEIGHT
-    int "matrix height"
-    default 32
-
-config LEDDISPLAY_ROWS_IN_PARALLEL
-    int "rows in parallel"
-    default 2
+choice
+    prompt "display type"
+    default LEDDISPLAY_TYPE_64X32_16SCAN
     help
-        not sure what this is; something to do with this 1/4, 1/8, 1/16 or 1/32 row scan?
+        The LED display type.
 
-config LEDDISPLAY_I2S_FREQ
-    int "I2S frequency [Hz] (see help!)"
-    default 20000000
+    config LEDDISPLAY_TYPE_32X16_4SCAN
+        bool "32x16 1/4 scan"
+
+    config LEDDISPLAY_TYPE_32X16_8SCAN
+        bool "32x16 1/8 scan"
+
+    config LEDDISPLAY_TYPE_32X32_8SCAN
+        bool "32x32 1/8 scan"
+
+    config LEDDISPLAY_TYPE_32X32_16SCAN
+        bool "32x32 1/16 scan"
+
+    config LEDDISPLAY_TYPE_64X32_8SCAN
+        bool "64x32 1/8 scan"
+
+    config LEDDISPLAY_TYPE_64X32_16SCAN
+        bool "64x32 1/16 scan"
+
+    config LEDDISPLAY_TYPE_64X64_32SCAN
+        bool "64x64 1/32 scan"
+
+    # what more exists, works?
+
+endchoice
+
+choice LEDDISPLAY_I2S_FREQ
+    prompt "I2S frequency"
+    default LEDDISPLAY_I2S_FREQ_20MHZ
     help
-        possible values: 13333334, 16000000, 20000000, 26666667
+        generally choose as high as possible / working
+
+    config LEDDISPLAY_I2S_FREQ_13MHZ
+        bool "13.3 MHz"
+
+    config LEDDISPLAY_I2S_FREQ_16MHZ
+        bool "16 MHz"
+
+    config LEDDISPLAY_I2S_FREQ_20MHZ
+        bool "20 MHz"
+
+    config LEDDISPLAY_I2S_FREQ_26MHZ
+        bool "26.6 MHz"
+
+endchoice
 
 config LEDDISPLAY_PRESERVE_RAM_SIZE
-    int "keep this much (DMA) RAM free"
+    int "keep this much (DMA) RAM free [bytes]"
     default 64000
 
 config LEDDISPLAY_MIN_FRAME_RATE
@@ -73,7 +104,7 @@ config LEDDISPLAY_D_GPIO
     default 21
 
 config LEDDISPLAY_E_GPIO
-    int "GPIO for the E signal"
+    int "GPIO for the E signal (1/32 scan types only)"
     default -1
 
 config LEDDISPLAY_LAT_GPIO

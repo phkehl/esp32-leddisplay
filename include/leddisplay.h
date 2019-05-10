@@ -39,6 +39,27 @@
 #include <sdkconfig.h>
 #include <esp_err.h>
 
+// configuration (see also leddisplay.c)
+#if CONFIG_LEDDISPLAY_TYPE_32X16_4SCAN || CONFIG_LEDDISPLAY_TYPE_32X16_8SCAN
+#  define LEDDISPLAY_WIDTH                32
+#  define LEDDISPLAY_HEIGHT               16
+
+#elif CONFIG_LEDDISPLAY_TYPE_32X32_8SCAN || CONFIG_LEDDISPLAY_TYPE_32X32_16SCAN
+#  define LEDDISPLAY_WIDTH                32
+#  define LEDDISPLAY_HEIGHT               32
+
+#elif CONFIG_LEDDISPLAY_TYPE_64X32_8SCAN || CONFIG_LEDDISPLAY_TYPE_64X32_16SCAN
+#  define LEDDISPLAY_WIDTH                64
+#  define LEDDISPLAY_HEIGHT               32
+
+#elif CONFIG_LEDDISPLAY_TYPE_64X64_32SCAN
+#  define LEDDISPLAY_WIDTH                64
+#  define LEDDISPLAY_HEIGHT               64
+
+#else
+#  error This CONFIG_LEDDISPLAY_TYPE is not implemented!
+#endif
+
 /* *********************************************************************************************** */
 /*!
     \name display functions
@@ -66,7 +87,7 @@ void leddisplay_shutdown(void);
 
 //! set global brightness level
 /*
-    \param[in] brightness  brightness level, range 0..#CONFIG_LEDDISPLAY_WIDTH
+    \param[in] brightness  brightness level, range 0..#LEDDISPLAY_WIDTH
 */
 void leddisplay_set_brightness(int brightness);
 
@@ -159,11 +180,11 @@ void leddisplay_pixel_update(int block);
 typedef union leddisplay_frame_u
 {
     //! access RGB pixel by coordinates
-    uint8_t yx[CONFIG_LEDDISPLAY_HEIGHT][CONFIG_LEDDISPLAY_WIDTH][3];
+    uint8_t yx[LEDDISPLAY_HEIGHT][LEDDISPLAY_WIDTH][3];
     //! access RGB pixel by index
-    uint8_t ix[CONFIG_LEDDISPLAY_HEIGHT * CONFIG_LEDDISPLAY_WIDTH][3];
+    uint8_t ix[LEDDISPLAY_HEIGHT * LEDDISPLAY_WIDTH][3];
     //! raw frame data
-    uint8_t raw[CONFIG_LEDDISPLAY_HEIGHT * CONFIG_LEDDISPLAY_WIDTH * 3];
+    uint8_t raw[LEDDISPLAY_HEIGHT * LEDDISPLAY_WIDTH * 3];
 } leddisplay_frame_t;
 
 //! set pixel to colour
@@ -198,8 +219,8 @@ void leddisplay_frame_clear(leddisplay_frame_t *p_frame);
 
 //! update display with frame
 /*!
-    Renders a frame to the display. The RGB data must be of the size #CONFIG_LEDDISPLAY_WIDTH *
-    #CONFIG_LEDDISPLAY_HEIGHT * 3. This will block as necessary until the frame buffer memory
+    Renders a frame to the display. The RGB data must be of the size #LEDDISPLAY_WIDTH *
+    #LEDDISPLAY_HEIGHT * 3. This will block as necessary until the frame buffer memory
     becomes available.
 
     \param[in,out] frame  RGB data for one frame, or NULL to clear the display

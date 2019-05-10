@@ -126,16 +126,6 @@
 #include "leddisplay.h"
 
 /* *********************************************************************************************** */
-// some config checks
-
-// currently untested with any other matrix size or scan configurations
-#if ( (CONFIG_LEDDISPLAY_WIDTH == 64) && (CONFIG_LEDDISPLAY_HEIGHT == 32) && (CONFIG_LEDDISPLAY_ROWS_IN_PARALLEL == 2) )
-// ok
-#else
-#  warning (Probably) illegal CONFIG_LEDDISPLAY_WIDTH and/or CONFIG_LEDDISPLAY_HEIGHT and/or CONFIG_LEDDISPLAY_ROWS_IN_PARALLEL. YMMV!
-#endif
-
-/* *********************************************************************************************** */
 // local logging and debugging
 
 #define LOGNAME "leddisplay"
@@ -183,20 +173,53 @@
 // CONFIG_LEDDISPLAY_E_CLK
 
 /* *********************************************************************************************** */
+// configuration (see also leddisplay.h)
 
-#define I2S_CLOCK_SPEED           CONFIG_LEDDISPLAY_I2S_FREQ
+#if CONFIG_LEDDISPLAY_TYPE_32X16_4SCAN     // not tested
+#  define LEDDISPLAY_ROWS_IN_PARALLEL      4
+#elif CONFIG_LEDDISPLAY_TYPE_32X16_8SCAN   // not tested
+#  define LEDDISPLAY_ROWS_IN_PARALLEL      2
+#elif CONFIG_LEDDISPLAY_TYPE_32X32_8SCAN   // not tested
+#  define LEDDISPLAY_ROWS_IN_PARALLEL      4
+#elif CONFIG_LEDDISPLAY_TYPE_32X32_16SCAN  // not tested
+#  define LEDDISPLAY_ROWS_IN_PARALLEL      4
+#elif CONFIG_LEDDISPLAY_TYPE_64X32_8SCAN   // not tested
+#  define LEDDISPLAY_ROWS_IN_PARALLEL      4
+#elif CONFIG_LEDDISPLAY_TYPE_64X32_16SCAN  // tested
+#  define LEDDISPLAY_ROWS_IN_PARALLEL      2
+#elif CONFIG_LEDDISPLAY_TYPE_64X64_32SCAN  // not tested
+#  define LEDDISPLAY_ROWS_IN_PARALLEL      2
+#  if CONFIG_LEDDISPLAY_E_GPIO < 0
+#    error Need CONFIG_LEDDISPLAY_E_GPIO > 0!
+#  endif
+#else
+#  error This CONFIG_LEDDISPLAY_TYPE is not implemented!
+#endif
+
+#if CONFIG_LEDDISPLAY_I2S_FREQ_13MHZ
+#  define I2S_CLOCK_SPEED  13333334
+#elif CONFIG_LEDDISPLAY_I2S_FREQ_16MHZ
+#  define I2S_CLOCK_SPEED  16000000
+#elif CONFIG_LEDDISPLAY_I2S_FREQ_20MHZ
+#  define I2S_CLOCK_SPEED  20000000
+#elif CONFIG_LEDDISPLAY_I2S_FREQ_26MHZ
+#  define I2S_CLOCK_SPEED  26666667
+#else
+#  error This CONFIG_LEDDISPLAY_I2S_FREQ is not implemented!
+#endif
+
 #define NUM_FRAME_BUFFERS         2
-#define OE_OFF_CLKS_AFTER_LATCH   1
+//#define OE_OFF_CLKS_AFTER_LATCH   1
 #define COLOR_DEPTH_BITS          8
-#define PIXELS_PER_LATCH          ((CONFIG_LEDDISPLAY_WIDTH * CONFIG_LEDDISPLAY_HEIGHT) / CONFIG_LEDDISPLAY_HEIGHT) // 64*32/32 = 64
-#define ROWS_PER_FRAME            (CONFIG_LEDDISPLAY_HEIGHT / CONFIG_LEDDISPLAY_ROWS_IN_PARALLEL) // 32/2 = 16
+#define PIXELS_PER_LATCH          ((LEDDISPLAY_WIDTH * LEDDISPLAY_HEIGHT) / LEDDISPLAY_HEIGHT) // 64*32/32 = 64
+#define ROWS_PER_FRAME            (LEDDISPLAY_HEIGHT / LEDDISPLAY_ROWS_IN_PARALLEL) // 32/2 = 16
 
 /* *********************************************************************************************** */
 
 // RGB data for two rows of pixels, and address and control signals
 typedef struct row_bit_s
 {
-    uint16_t pixel[CONFIG_LEDDISPLAY_WIDTH];
+    uint16_t pixel[LEDDISPLAY_WIDTH];
 } row_bit_t;
 // Note: sizeof(data) must be multiple of 32 bits, as DMA linked list buffer address pointer must be word-aligned
 
@@ -258,7 +281,7 @@ esp_err_t leddisplay_init(void)
 {
     esp_err_t res = ESP_OK;
 
-    INFO(STRINGIFY(CONFIG_LEDDISPLAY_WIDTH) "x" STRINGIFY(CONFIG_LEDDISPLAY_HEIGHT) "(" STRINGIFY(COLOR_DEPTH_BITS) "bits)");
+    INFO(STRINGIFY(LEDDISPLAY_WIDTH) "x" STRINGIFY(LEDDISPLAY_HEIGHT) " (" STRINGIFY(COLOR_DEPTH_BITS) "bits)");
 
     DEBUG("GPIOs:"
         " R1="  STRINGIFY(CONFIG_LEDDISPLAY_R1_GPIO)
@@ -278,9 +301,9 @@ esp_err_t leddisplay_init(void)
 
     // set default brightness
 #if CONFIG_LEDDISPLAY_CORR_LUMINANCE
-    leddisplay_set_brightness(CONFIG_LEDDISPLAY_WIDTH * 4 / 3);
+    leddisplay_set_brightness(LEDDISPLAY_WIDTH * 4 / 3);
 #else
-    leddisplay_set_brightness(CONFIG_LEDDISPLAY_WIDTH / 2);
+    leddisplay_set_brightness(LEDDISPLAY_WIDTH / 2);
 #endif
 
     // allocate memory for the frame buffers, initialise frame buffers
@@ -559,16 +582,16 @@ void leddisplay_set_brightness(int brightness)
     {
         s_brightness_user = 0;
     }
-    else if (brightness > CONFIG_LEDDISPLAY_WIDTH)
+    else if (brightness > LEDDISPLAY_WIDTH)
     {
-        s_brightness_user = CONFIG_LEDDISPLAY_WIDTH;
+        s_brightness_user = LEDDISPLAY_WIDTH;
     }
     else
     {
         s_brightness_user = brightness;
     }
-    const int f = 256 / CONFIG_LEDDISPLAY_WIDTH;
-    if (s_brightness_user < CONFIG_LEDDISPLAY_WIDTH)
+    const int f = 256 / LEDDISPLAY_WIDTH;
+    if (s_brightness_user < LEDDISPLAY_WIDTH)
     {
         s_brightness = val2pwm(s_brightness_user * f) / f;
     }
@@ -581,9 +604,9 @@ void leddisplay_set_brightness(int brightness)
     {
         s_brightness = 0;
     }
-    else if (brightness > CONFIG_LEDDISPLAY_WIDTH)
+    else if (brightness > LEDDISPLAY_WIDTH)
     {
-        s_brightness = CONFIG_LEDDISPLAY_WIDTH;
+        s_brightness = LEDDISPLAY_WIDTH;
     }
     else
     {
@@ -605,7 +628,7 @@ int leddisplay_get_brightness(void)
 
 void leddisplay_pixel_xy_rgb(uint16_t x_coord, uint16_t y_coord, uint8_t red, uint8_t green, uint8_t blue)
 {
-    if ( (x_coord >= CONFIG_LEDDISPLAY_WIDTH) || (y_coord >= CONFIG_LEDDISPLAY_HEIGHT) )
+    if ( (x_coord >= LEDDISPLAY_WIDTH) || (y_coord >= LEDDISPLAY_HEIGHT) )
     {
         return;
     }
@@ -744,9 +767,9 @@ void leddisplay_pixel_xy_rgb(uint16_t x_coord, uint16_t y_coord, uint8_t red, ui
 void leddisplay_pixel_fill_rgb(uint8_t red, uint8_t green, uint8_t blue)
 {
 #if 0
-    for (uint16_t y = 0; y < CONFIG_LEDDISPLAY_HEIGHT; y++)
+    for (uint16_t y = 0; y < LEDDISPLAY_HEIGHT; y++)
     {
-        for (uint16_t x = 0; x < CONFIG_LEDDISPLAY_WIDTH; x++)
+        for (uint16_t x = 0; x < LEDDISPLAY_WIDTH; x++)
         {
             leddisplay_pixel_xy_rgb(x, y, red, green, blue);
         }
@@ -768,7 +791,7 @@ void leddisplay_pixel_fill_rgb(uint8_t red, uint8_t green, uint8_t blue)
             // the destination for the pixel bitstream
             row_bit_t *rowbits = &row_data->rowbits[bitplane_ix]; //matrixUpdateFrames location to write to uint16_t's
 
-            for (int x_coord = 0; x_coord < CONFIG_LEDDISPLAY_WIDTH; x_coord++) // row pixel width 64 iterations
+            for (int x_coord = 0; x_coord < LEDDISPLAY_WIDTH; x_coord++) // row pixel width 64 iterations
             {
                 int v = 0; // the output bitstream
 
@@ -834,7 +857,7 @@ void leddisplay_pixel_fill_rgb(uint8_t red, uint8_t green, uint8_t blue)
 
 inline void leddisplay_frame_xy_rgb(leddisplay_frame_t *p_frame, uint16_t x_coord, uint16_t y_coord, uint8_t red, uint8_t green, uint8_t blue)
 {
-    if ( (x_coord >= CONFIG_LEDDISPLAY_WIDTH) || (y_coord >= CONFIG_LEDDISPLAY_HEIGHT) )
+    if ( (x_coord >= LEDDISPLAY_WIDTH) || (y_coord >= LEDDISPLAY_HEIGHT) )
     {
         return;
     }
@@ -871,9 +894,9 @@ void leddisplay_frame_update(leddisplay_frame_t *p_frame)
     xSemaphoreTake(s_shift_complete_sem, portMAX_DELAY);
 
 #if 0
-    for (uint16_t x = 0; x < CONFIG_LEDDISPLAY_WIDTH; x++)
+    for (uint16_t x = 0; x < LEDDISPLAY_WIDTH; x++)
     {
-        for (uint16_t y = 0; y < CONFIG_LEDDISPLAY_HEIGHT; y++)
+        for (uint16_t y = 0; y < LEDDISPLAY_HEIGHT; y++)
         {
             const uint8_t *p_rgb = p_frame->yx[y][x];
             leddisplay_pixel_xy_rgb(x, y, p_rgb[0], p_rgb[1], p_rgb[2]);
@@ -897,7 +920,7 @@ void leddisplay_frame_update(leddisplay_frame_t *p_frame)
             // the destination for the pixel bitstream
             row_bit_t *rowbits = &row_data->rowbits[bitplane_ix]; //matrixUpdateFrames location to write to uint16_t's
 
-            for (int x_coord = 0; x_coord < CONFIG_LEDDISPLAY_WIDTH; x_coord++) // row pixel width 64 iterations
+            for (int x_coord = 0; x_coord < LEDDISPLAY_WIDTH; x_coord++) // row pixel width 64 iterations
             {
                 int v = 0; // the output bitstream
 
