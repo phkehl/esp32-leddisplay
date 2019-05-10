@@ -56,7 +56,7 @@ void app_main(void)
 {
     monStart();
     //monSetPeriod(1000);
-    
+
     osSleep(2000);
     printf("\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n");
 
