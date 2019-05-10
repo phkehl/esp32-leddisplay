@@ -408,7 +408,8 @@ esp_err_t leddisplay_init(void)
         }
         s_dmadesc_b = (lldesc_t *)heap_caps_malloc(desccount * sizeof(lldesc_t), MALLOC_CAP_DMA);
         if (s_dmadesc_b == NULL)
-        {            WARNING("desc b alloc");
+        {
+            WARNING("desc b alloc");
             res = ESP_ERR_NO_MEM;
         }
     }
@@ -844,11 +845,18 @@ inline void leddisplay_frame_xy_rgb(leddisplay_frame_t *p_frame, uint16_t x_coor
 
 inline void leddisplay_frame_fill_rgb(leddisplay_frame_t *p_frame, uint8_t red, uint8_t green, uint8_t blue)
 {
-    for (uint16_t ix = 0; ix < NUMOF(p_frame->ix); ix++)
+    if ( (red == green) && (red == blue) )
     {
-        p_frame->ix[ix][0] = red;
-        p_frame->ix[ix][1] = green;
-        p_frame->ix[ix][2] = blue;
+        memset(p_frame, red, sizeof(*p_frame));
+    }
+    else
+    {
+        for (uint16_t ix = 0; ix < NUMOF(p_frame->ix); ix++)
+        {
+            p_frame->ix[ix][0] = red;
+            p_frame->ix[ix][1] = green;
+            p_frame->ix[ix][2] = blue;
+        }
     }
 }
 
