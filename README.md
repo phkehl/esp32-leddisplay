@@ -1,9 +1,9 @@
-# ESP32 (esp-idf) component for driving dumb LED displays using I2S parallel mode DMA
+# ESP32 (esp-idf) component for driving HUB75 LED displays using I2S parallel mode DMA
 
 ## Introduction
 
 This is a *leddisplay* component for the ESP-IDF [1] for ESP32. It can be used
-to drive "dumb" LED displays (a.k.a. "Px displays").
+to drive HUB75 LED displays (a.k.a. "Px displays").
 
 See [leddisplay.h](include/leddisplay.h) for the API.
 
