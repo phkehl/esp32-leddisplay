@@ -1,140 +1,182 @@
 menu "LED Display"
 
-choice
-    prompt "display type"
-    default LEDDISPLAY_TYPE_64X32_16SCAN
-    help
-        The LED display type.
-
-    config LEDDISPLAY_TYPE_32X16_4SCAN
-        bool "32x16 1/4 scan"
-
-    config LEDDISPLAY_TYPE_32X16_8SCAN
-        bool "32x16 1/8 scan"
-
-    config LEDDISPLAY_TYPE_32X32_8SCAN
-        bool "32x32 1/8 scan"
-
-    config LEDDISPLAY_TYPE_32X32_16SCAN
-        bool "32x32 1/16 scan"
-
-    config LEDDISPLAY_TYPE_64X32_8SCAN
-        bool "64x32 1/8 scan"
-
-    config LEDDISPLAY_TYPE_64X32_16SCAN
-        bool "64x32 1/16 scan"
-
-    config LEDDISPLAY_TYPE_64X64_32SCAN
-        bool "64x64 1/32 scan"
-
-    # what more exists, works?
-
-endchoice
-
-choice LEDDISPLAY_I2S_FREQ
-    prompt "I2S frequency"
-    default LEDDISPLAY_I2S_FREQ_20MHZ
-    help
-        generally choose as high as possible / working
-
-    config LEDDISPLAY_I2S_FREQ_13MHZ
-        bool "13.3 MHz"
-
-    config LEDDISPLAY_I2S_FREQ_16MHZ
-        bool "16 MHz"
-
-    config LEDDISPLAY_I2S_FREQ_20MHZ
-        bool "20 MHz"
-
-    config LEDDISPLAY_I2S_FREQ_26MHZ
-        bool "26.6 MHz"
-
-endchoice
-
-config LEDDISPLAY_PRESERVE_RAM_SIZE
-    int "keep this much (DMA) RAM free [bytes]"
-    default 64000
-
-config LEDDISPLAY_MIN_FRAME_RATE
-    int "minimum frame refresh rate [Hz]"
-    default 50
-
-# see val2pwm.c
-choice LEDDISPLAY_CORR_BRIGHT
-    prompt "correct perceived brightness"
-    default LEDDISPLAY_CORR_BRIGHT_MODIFIED
-
-    config LEDDISPLAY_CORR_BRIGHT_NONE
-        bool "no brightness correction"
-
-    config LEDDISPLAY_CORR_BRIGHT_STRICT
-        bool "strict brightness correction"
+    choice
+        prompt "display type"
+        default LEDDISPLAY_TYPE_64X32_16SCAN
         help
-            colour values < 10 is LED fully off, and only values >= 10 will lit the LED,
-            using original brightness correction curve
+            The LED display type.
 
-    config LEDDISPLAY_CORR_BRIGHT_MODIFIED
-        bool "modified brightness correction"
+        config LEDDISPLAY_TYPE_32X16_4SCAN
+            bool "32x16 1/4 scan"
+
+        config LEDDISPLAY_TYPE_32X16_8SCAN
+            bool "32x16 1/8 scan"
+
+        config LEDDISPLAY_TYPE_32X32_8SCAN
+            bool "32x32 1/8 scan"
+
+        config LEDDISPLAY_TYPE_32X32_16SCAN
+            bool "32x32 1/16 scan"
+
+        config LEDDISPLAY_TYPE_64X32_8SCAN
+            bool "64x32 1/8 scan"
+
+        config LEDDISPLAY_TYPE_64X32_16SCAN
+            bool "64x32 1/16 scan"
+
+        config LEDDISPLAY_TYPE_64X64_32SCAN
+            bool "64x64 1/32 scan"
+
+        # what more exists, works?
+
+    endchoice
+
+    choice LEDDISPLAY_I2S_FREQ
+        prompt "I2S frequency"
+        default LEDDISPLAY_I2S_FREQ_20MHZ
         help
-            only colour value 0 is LED fully off, and any value > 0 will lit the LED,
-            the original correction curve is scaled accordingly
+            generally choose as high as possible / working
 
-endchoice
+        config LEDDISPLAY_I2S_FREQ_13MHZ
+            bool "13.3 MHz"
 
-config LEDDISPLAY_R1_GPIO
-    int "GPIO for the R1 signal"
-    default 2
+        config LEDDISPLAY_I2S_FREQ_16MHZ
+            bool "16 MHz"
 
-config LEDDISPLAY_G1_GPIO
-    int "GPIO for the G1 signal"
-    default 15
+        config LEDDISPLAY_I2S_FREQ_20MHZ
+            bool "20 MHz"
 
-config LEDDISPLAY_B1_GPIO
-    int "GPIO for the B1 signal"
-    default 4
+        config LEDDISPLAY_I2S_FREQ_26MHZ
+            bool "26.6 MHz"
 
-config LEDDISPLAY_R2_GPIO
-    int "GPIO for the R2 signal"
-    default 16
+    endchoice
 
-config LEDDISPLAY_G2_GPIO
-    int "GPIO for the G2 signal"
-    default 27
+    config LEDDISPLAY_PRESERVE_RAM_SIZE
+        int "keep this much (DMA) RAM free [bytes]"
+        default 64000
 
-config LEDDISPLAY_B2_GPIO
-    int "GPIO for the B2 signal"
-    default 17
+    config LEDDISPLAY_MIN_FRAME_RATE
+        int "minimum frame refresh rate [Hz]"
+        default 50
 
-config LEDDISPLAY_A_GPIO
-    int "GPIO for the A signal"
-    default 5
+    # see val2pwm.c
+    choice LEDDISPLAY_CORR_BRIGHT
+        prompt "correct perceived brightness"
+        default LEDDISPLAY_CORR_BRIGHT_MODIFIED
 
-config LEDDISPLAY_B_GPIO
-    int "GPIO for the B signal"
-    default 18
+        config LEDDISPLAY_CORR_BRIGHT_NONE
+            bool "no brightness correction"
 
-config LEDDISPLAY_C_GPIO
-    int "GPIO for the C signal"
-    default 19
+        config LEDDISPLAY_CORR_BRIGHT_STRICT
+            bool "strict brightness correction"
+            help
+                colour values < 10 is LED fully off, and only values >= 10 will lit the LED,
+                using original brightness correction curve
 
-config LEDDISPLAY_D_GPIO
-    int "GPIO for the D signal"
-    default 21
+        config LEDDISPLAY_CORR_BRIGHT_MODIFIED
+            bool "modified brightness correction"
+            help
+                only colour value 0 is LED fully off, and any value > 0 will lit the LED,
+                the original correction curve is scaled accordingly
 
-config LEDDISPLAY_E_GPIO
-    int "GPIO for the E signal (1/32 scan types only)"
-    default -1
+    endchoice
 
-config LEDDISPLAY_LAT_GPIO
-    int "GPIO for the LAT signal"
-    default 26
+    config LEDDISPLAY_R1_GPIO
+        int "GPIO for the R1 signal"
+        default 2
+        range 0 35
+        help
+            typically usable pins are 2, 4-5, 12-33
 
-config LEDDISPLAY_OE_GPIO
-    int "GPIO for the OE signal"
-    default 25
+    config LEDDISPLAY_G1_GPIO
+        int "GPIO for the G1 signal"
+        default 15
+        range 0 33
+        help
+            typically usable pins are 2, 4-5, 12-33
 
-config LEDDISPLAY_CLK_GPIO
-    int "GPIO for the CLK signal"
-    default 22
+    config LEDDISPLAY_B1_GPIO
+        int "GPIO for the B1 signal"
+        default 4
+        range 0 33
+        help
+            typically usable pins are 2, 4-5, 12-33
+
+    config LEDDISPLAY_R2_GPIO
+        int "GPIO for the R2 signal"
+        default 16
+        range 0 33
+        help
+            typically usable pins are 2, 4-5, 12-33
+
+    config LEDDISPLAY_G2_GPIO
+        int "GPIO for the G2 signal"
+        default 27
+        range 0 33
+        help
+            typically usable pins are 2, 4-5, 12-33
+
+    config LEDDISPLAY_B2_GPIO
+        int "GPIO for the B2 signal"
+        default 17
+        range 0 33
+        help
+            typically usable pins are 2, 4-5, 12-33
+
+    config LEDDISPLAY_A_GPIO
+        int "GPIO for the A signal"
+        default 5
+        range 0 33
+        help
+            typically usable pins are 2, 4-5, 12-33
+
+    config LEDDISPLAY_B_GPIO
+        int "GPIO for the B signal"
+        default 18
+        range 0 33
+        help
+            typically usable pins are 2, 4-5, 12-33
+
+    config LEDDISPLAY_C_GPIO
+        int "GPIO for the C signal"
+        default 19
+        range 0 33
+        help
+            typically usable pins are 2, 4-5, 12-33
+
+    config LEDDISPLAY_D_GPIO
+        int "GPIO for the D signal"
+        default 21
+        range 0 33
+        help
+            typically usable pins are 2, 4-5, 12-33
+
+    config LEDDISPLAY_E_GPIO
+        int "GPIO for the E signal (1/32 scan types only)"
+        default -1
+        range -1 33
+        help
+            typically usable pins are 2, 4-5, 12-33
+
+    config LEDDISPLAY_LAT_GPIO
+        int "GPIO for the LAT signal"
+        default 26
+        range 0 33
+        help
+            typically usable pins are 2, 4-5, 12-33
+
+    config LEDDISPLAY_OE_GPIO
+        int "GPIO for the OE signal"
+        default 25
+        range 0 33
+        help
+            typically usable pins are 2, 4-5, 12-33
+
+    config LEDDISPLAY_CLK_GPIO
+        int "GPIO for the CLK signal"
+        default 22
+        range 0 33
+        help
+            typically usable pins are 2, 4-5, 12-33
 
 endmenu

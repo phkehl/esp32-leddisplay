@@ -293,7 +293,9 @@ esp_err_t leddisplay_init(void)
         " B="   STRINGIFY(CONFIG_LEDDISPLAY_B_GPIO)
         " C="   STRINGIFY(CONFIG_LEDDISPLAY_C_GPIO)
         " D="   STRINGIFY(CONFIG_LEDDISPLAY_D_GPIO)
+#if (CONFIG_LEDDISPLAY_E_GPIO > -1)
         " E="   STRINGIFY(CONFIG_LEDDISPLAY_E_GPIO)
+#endif
         " LAT=" STRINGIFY(CONFIG_LEDDISPLAY_LAT_GPIO)
         " OE="  STRINGIFY(CONFIG_LEDDISPLAY_OE_GPIO)
         " CLK=" STRINGIFY(CONFIG_LEDDISPLAY_CLK_GPIO));
@@ -506,7 +508,11 @@ esp_err_t leddisplay_init(void)
                 CONFIG_LEDDISPLAY_B_GPIO,    //  9 BIT_B
                 CONFIG_LEDDISPLAY_C_GPIO,    // 10 BIT_C
                 CONFIG_LEDDISPLAY_D_GPIO,    // 11 BIT_D
+#if (CONFIG_LEDDISPLAY_E_GPIO > -1)
                 CONFIG_LEDDISPLAY_E_GPIO,    // 12 BIT_E
+#else
+                -1,
+#endif
                 -1,                          // 13
                 -1,                          // 14
                 -1,                          // 15

@@ -134,6 +134,7 @@ void i2s_parallel_link_dma_desc(volatile lldesc_t *dmadesc, volatile lldesc_t *p
         prevdmadesc->qe.stqe_next = (lldesc_t*)dmadesc;
 }
 
+// FIXME: add error handling (not all pins can be output..)?
 static void gpio_setup_out(int gpio, int sig) {
     if (gpio==-1) return;
     PIN_FUNC_SELECT(GPIO_PIN_MUX_REG[gpio], PIN_FUNC_GPIO);
