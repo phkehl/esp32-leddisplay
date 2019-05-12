@@ -56,12 +56,30 @@ config LEDDISPLAY_PRESERVE_RAM_SIZE
     default 64000
 
 config LEDDISPLAY_MIN_FRAME_RATE
-    int "minimum frame refresh rate"
+    int "minimum frame refresh rate [Hz]"
     default 50
 
-config LEDDISPLAY_CORR_LUMINANCE
-       bool "correct luminance (or so..)"
-       default y
+# see val2pwm.c
+choice LEDDISPLAY_CORR_BRIGHT
+    prompt "correct perceived brightness"
+    default LEDDISPLAY_CORR_BRIGHT_MODIFIED
+
+    config LEDDISPLAY_CORR_BRIGHT_NONE
+        bool "no brightness correction"
+
+    config LEDDISPLAY_CORR_BRIGHT_STRICT
+        bool "strict brightness correction"
+        help
+            colour values < 10 is LED fully off, and only values >= 10 will lit the LED,
+            using original brightness correction curve
+
+    config LEDDISPLAY_CORR_BRIGHT_MODIFIED
+        bool "modified brightness correction"
+        help
+            only colour value 0 is LED fully off, and any value > 0 will lit the LED,
+            the original correction curve is scaled accordingly
+
+endchoice
 
 config LEDDISPLAY_R1_GPIO
     int "GPIO for the R1 signal"

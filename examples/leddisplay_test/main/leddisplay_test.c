@@ -102,6 +102,30 @@ static void sLeddisplayTestTask(void *pParam)
 
         /* ***** pixel based API ***************************************************************** */
 
+        leddisplay_set_brightness(LEDDISPLAY_WIDTH);
+
+        INFO("ghosting test 1 (pixel)");
+        {
+            for (uint16_t x = 0; x < LEDDISPLAY_WIDTH; x++)
+            {
+                leddisplay_pixel_xy_rgb(x, 0, 255, 255, 255);
+            }
+            leddisplay_pixel_update(0);
+            osSleep(20 * delay);
+
+        }
+        INFO("ghosting test 2 (pixel)");
+        {
+            for (uint16_t xy = 0; xy < LEDDISPLAY_HEIGHT; xy++)
+            {
+                leddisplay_pixel_xy_rgb(xy, xy, 255, 255, 255);
+            }
+            leddisplay_pixel_update(0);
+            osSleep(20 * delay);
+        }
+
+        // -----------------------------------------------------------------------------------------
+
         INFO("fill (pixel)");
         for (int which = 1; which <= 7; which++)
         {
@@ -295,6 +319,30 @@ static void sLeddisplayTestTask(void *pParam)
 
 
         /* ***** frame based API ***************************************************************** */
+
+        INFO("ghosting test 1 (frame)");
+        {
+            leddisplay_frame_fill_rgb(&sDispFrame, 0, 0, 0);
+            for (uint16_t x = 0; x < LEDDISPLAY_WIDTH; x++)
+            {
+                leddisplay_frame_xy_rgb(&sDispFrame, x, 0, 255, 255, 255);
+            }
+            leddisplay_frame_update(&sDispFrame);
+            osSleep(20 * delay);
+        }
+
+        INFO("ghosting test 2 (frame)");
+        {
+            leddisplay_frame_fill_rgb(&sDispFrame, 0, 0, 0);
+            for (uint16_t xy = 0; xy < LEDDISPLAY_HEIGHT; xy++)
+            {
+                leddisplay_frame_xy_rgb(&sDispFrame, xy, xy, 255, 255, 255);
+            }
+            leddisplay_frame_update(&sDispFrame);
+            osSleep(20 * delay);
+        }
+
+        // -----------------------------------------------------------------------------------------
 
         INFO("fill (frame)");
         for (int which = 1; which <= 7; which++)

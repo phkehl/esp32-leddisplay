@@ -249,7 +249,7 @@ lldesc_t *s_dmadesc_a;
 lldesc_t *s_dmadesc_b;
 
 static int s_brightness;
-#if CONFIG_LEDDISPLAY_CORR_LUMINANCE
+#if CONFIG_LEDDISPLAY_CORR_BRIGHT_STRICT || CONFIG_LEDDISPLAY_CORR_BRIGHT_MODIFIED
 static int s_brightness_user;
 #endif
 
@@ -300,7 +300,7 @@ esp_err_t leddisplay_init(void)
         " CLK=" STRINGIFY(CONFIG_LEDDISPLAY_CLK_GPIO));
 
     // set default brightness
-#if CONFIG_LEDDISPLAY_CORR_LUMINANCE
+#if CONFIG_LEDDISPLAY_CORR_BRIGHT_STRICT || CONFIG_LEDDISPLAY_CORR_BRIGHT_MODIFIED
     leddisplay_set_brightness(LEDDISPLAY_WIDTH * 4 / 3);
 #else
     leddisplay_set_brightness(LEDDISPLAY_WIDTH / 2);
@@ -577,7 +577,7 @@ void leddisplay_shutdown(void)
 
 void leddisplay_set_brightness(int brightness)
 {
-#if CONFIG_LEDDISPLAY_CORR_LUMINANCE
+#if CONFIG_LEDDISPLAY_CORR_BRIGHT_STRICT || CONFIG_LEDDISPLAY_CORR_BRIGHT_MODIFIED
     if (brightness < 0)
     {
         s_brightness_user = 0;
@@ -617,7 +617,7 @@ void leddisplay_set_brightness(int brightness)
 
 int leddisplay_get_brightness(void)
 {
-#if CONFIG_LEDDISPLAY_CORR_LUMINANCE
+#if CONFIG_LEDDISPLAY_CORR_BRIGHT_STRICT || CONFIG_LEDDISPLAY_CORR_BRIGHT_MODIFIED
     return s_brightness_user;
 #else
     return s_brightness;
@@ -641,7 +641,7 @@ void leddisplay_pixel_xy_rgb(uint16_t x_coord, uint16_t y_coord, uint8_t red, ui
         paint_top_half = false;
     }
 
-#if CONFIG_LEDDISPLAY_CORR_LUMINANCE
+#if CONFIG_LEDDISPLAY_CORR_BRIGHT_STRICT || CONFIG_LEDDISPLAY_CORR_BRIGHT_MODIFIED
     red   = val2pwm(red);
     green = val2pwm(green);
     blue  = val2pwm(blue);
@@ -775,7 +775,7 @@ void leddisplay_pixel_fill_rgb(uint8_t red, uint8_t green, uint8_t blue)
         }
     }
 #else
-#if CONFIG_LEDDISPLAY_CORR_LUMINANCE
+#if CONFIG_LEDDISPLAY_CORR_BRIGHT_STRICT || CONFIG_LEDDISPLAY_CORR_BRIGHT_MODIFIED
     red   = val2pwm(red);
     green = val2pwm(green);
     blue  = val2pwm(blue);
@@ -810,7 +810,8 @@ void leddisplay_pixel_fill_rgb(uint8_t red, uint8_t green, uint8_t blue)
                 if (x_coord == 0) { v |= BIT_OE; }
 
                 // drive latch while shifting out last bit of RGB data
-                if (x_coord == (PIXELS_PER_LATCH - 1)) { v |= BIT_LAT; }
+                // need to turn off OE one clock before latch, otherwise can get ghosting
+                if (x_coord == (PIXELS_PER_LATCH - 1)) { v |= (BIT_LAT | BIT_OE); }
 
                 // turn off OE after brightness value is reached when displaying MSBs
                 // MSBs always output normal brightness
@@ -827,9 +828,6 @@ void leddisplay_pixel_fill_rgb(uint8_t red, uint8_t green, uint8_t blue)
                     int lsbBrightness = s_brightness >> (s_lsb_msb_transition_bit - bitplane_ix + 1);
                     if (x_coord >= lsbBrightness) { v |= BIT_OE; } // For Brightness
                 }
-
-                // need to turn off OE one clock before latch, otherwise can get ghosting
-                if (x_coord == (PIXELS_PER_LATCH - 1)) { v |= BIT_OE; }
 
                 // top and bottom half colours
                 if (red    & mask) { v |= (BIT_R1 | BIT_R2); }
@@ -903,7 +901,7 @@ void leddisplay_frame_update(leddisplay_frame_t *p_frame)
         }
     }
 #else
-#if CONFIG_LEDDISPLAY_CORR_LUMINANCE
+#if CONFIG_LEDDISPLAY_CORR_BRIGHT_STRICT || CONFIG_LEDDISPLAY_CORR_BRIGHT_MODIFIED
     for (uint16_t ix = 0; ix < NUMOF(p_frame->raw); ix++)
     {
         p_frame->raw[ix] = val2pwm(p_frame->raw[ix]);
@@ -939,7 +937,8 @@ void leddisplay_frame_update(leddisplay_frame_t *p_frame)
                 if (x_coord == 0) { v |= BIT_OE; }
 
                 // drive latch while shifting out last bit of RGB data
-                if (x_coord == (PIXELS_PER_LATCH - 1)) { v |= BIT_LAT; }
+                // need to turn off OE one clock before latch, otherwise can get ghosting
+                if (x_coord == (PIXELS_PER_LATCH - 1)) { v |= (BIT_LAT | BIT_OE); }
 
                 // turn off OE after brightness value is reached when displaying MSBs
                 // MSBs always output normal brightness
@@ -956,9 +955,6 @@ void leddisplay_frame_update(leddisplay_frame_t *p_frame)
                     int lsbBrightness = s_brightness >> (s_lsb_msb_transition_bit - bitplane_ix + 1);
                     if (x_coord >= lsbBrightness) { v |= BIT_OE; } // For Brightness
                 }
-
-                // need to turn off OE one clock before latch, otherwise can get ghosting
-                if (x_coord == (PIXELS_PER_LATCH - 1)) { v |= BIT_OE; }
 
                 // top half
                 const uint8_t *p_rgb_top = p_frame->yx[y_coord][x_coord];
