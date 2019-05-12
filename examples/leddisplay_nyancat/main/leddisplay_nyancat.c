@@ -129,7 +129,7 @@ static void sLeddisplayTestTask(void *pParam)
         {
             const int oldBrightness = leddisplay_get_brightness();
             const int delta = 1;
-            int n = LEDDISPLAY_WIDTH * 2 / delta;
+            int n = 100 * 2 / delta;
             int aniFrame = 0;
             int brightness = 0;
             int dir = delta;
@@ -143,18 +143,17 @@ static void sLeddisplayTestTask(void *pParam)
                 aniFrame %= 12;
 
                 brightness += dir;
-                if (brightness > LEDDISPLAY_WIDTH)
+                if (brightness >= 100)
                 {
                     dir = -delta;
                     brightness -= 2 * delta;
                 }
-                else if (brightness < 0)
+                else if (brightness <= 0)
                 {
                     dir = +delta;
                     brightness += 2 * delta;
                 }
             }
-            DEBUG("reset brightness");
             leddisplay_set_brightness(oldBrightness);
         }
 

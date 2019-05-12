@@ -1,6 +1,6 @@
 /*!
     \file
-    \brief LED display driver using I2S parallel mode
+    \brief HUB75 LED display driver using I2S parallel mode
 
     Based on:
     - https://esp32.com/viewtopic.php?t=3188
@@ -248,10 +248,9 @@ static int s_lsb_msb_transition_bit;
 lldesc_t *s_dmadesc_a;
 lldesc_t *s_dmadesc_b;
 
-static int s_brightness;
-#if CONFIG_LEDDISPLAY_CORR_BRIGHT_STRICT || CONFIG_LEDDISPLAY_CORR_BRIGHT_MODIFIED
-static int s_brightness_user;
-#endif
+// brightness level (value for data calculation, and percent used in API)
+static int s_brightness_val;
+static int s_brightness_percent;
 
 // flush complete semaphore
 SemaphoreHandle_t s_shift_complete_sem;
@@ -299,12 +298,8 @@ esp_err_t leddisplay_init(void)
         " OE="  STRINGIFY(CONFIG_LEDDISPLAY_OE_GPIO)
         " CLK=" STRINGIFY(CONFIG_LEDDISPLAY_CLK_GPIO));
 
-    // set default brightness
-#if CONFIG_LEDDISPLAY_CORR_BRIGHT_STRICT || CONFIG_LEDDISPLAY_CORR_BRIGHT_MODIFIED
-    leddisplay_set_brightness(LEDDISPLAY_WIDTH * 4 / 3);
-#else
-    leddisplay_set_brightness(LEDDISPLAY_WIDTH / 2);
-#endif
+    // set default brightness 75%
+    leddisplay_set_brightness(75);
 
     // allocate memory for the frame buffers, initialise frame buffers
     if (res == ESP_OK)
@@ -575,53 +570,56 @@ void leddisplay_shutdown(void)
 
 /* *********************************************************************************************** */
 
-void leddisplay_set_brightness(int brightness)
+int leddisplay_set_brightness(int brightness)
 {
-#if CONFIG_LEDDISPLAY_CORR_BRIGHT_STRICT || CONFIG_LEDDISPLAY_CORR_BRIGHT_MODIFIED
-    if (brightness < 0)
+    const int last_brightness_percent = s_brightness_percent;
+
+    if (brightness <= 0)
     {
-        s_brightness_user = 0;
+        s_brightness_val = 0;
+        s_brightness_percent = 0;
     }
-    else if (brightness > LEDDISPLAY_WIDTH)
+    else if (brightness >= 100)
     {
-        s_brightness_user = LEDDISPLAY_WIDTH;
-    }
-    else
-    {
-        s_brightness_user = brightness;
-    }
-    const int f = 256 / LEDDISPLAY_WIDTH;
-    if (s_brightness_user < LEDDISPLAY_WIDTH)
-    {
-        s_brightness = val2pwm(s_brightness_user * f) / f;
+        s_brightness_val = LEDDISPLAY_WIDTH;
+        s_brightness_percent = 100;
     }
     else
     {
-        s_brightness = s_brightness_user;
-    }
+        s_brightness_percent = brightness;
+
+        // scale brightness percent to value for this display: 0..100% --> 0..LEDDISPLAY_WIDTH
+        const int brightness_val = ((((1000 * LEDDISPLAY_WIDTH) * brightness) + 500) / 1000) / 100;
+
+#if CONFIG_LEDDISPLAY_CORR_BRIGHT_STRICT
+
+        const int f = 256 / LEDDISPLAY_WIDTH;
+        s_brightness_val = val2pwm(brightness_val * f) / f;
+
+#elif CONFIG_LEDDISPLAY_CORR_BRIGHT_MODIFIED
+
+        const int f = 256 / LEDDISPLAY_WIDTH;
+        const int lut = val2pwm(brightness_val * f) / f;
+        if (lut <= 0)
+        {
+            s_brightness_val = 1;
+        }
+        else
+        {
+            s_brightness_val = lut;
+        }
+
 #else
-    if (brightness < 0)
-    {
-        s_brightness = 0;
-    }
-    else if (brightness > LEDDISPLAY_WIDTH)
-    {
-        s_brightness = LEDDISPLAY_WIDTH;
-    }
-    else
-    {
-        s_brightness = brightness;
-    }
+        s_brightness_val = brightness_val;
 #endif
+    }
+
+    return last_brightness_percent;
 }
 
 int leddisplay_get_brightness(void)
 {
-#if CONFIG_LEDDISPLAY_CORR_BRIGHT_STRICT || CONFIG_LEDDISPLAY_CORR_BRIGHT_MODIFIED
-    return s_brightness_user;
-#else
-    return s_brightness;
-#endif
+    return s_brightness_percent;
 }
 
 /* *********************************************************************************************** */
@@ -684,7 +682,7 @@ void leddisplay_pixel_xy_rgb(uint16_t x_coord, uint16_t y_coord, uint8_t red, ui
         // turn off OE after brightness value is reached when displaying MSBs
         // MSBs always output normal brightness
         // LSB (bitplane_ix == 0) outputs normal brightness as MSB from previous row is being displayed
-        if ( ((bitplane_ix == 0) || (bitplane_ix > s_lsb_msb_transition_bit)) && (x_coord >= s_brightness) )
+        if ( ((bitplane_ix == 0) || (bitplane_ix > s_lsb_msb_transition_bit)) && (x_coord >= s_brightness_val) )
         {
             v |= BIT_OE; // for Brightness
         }
@@ -694,7 +692,7 @@ void leddisplay_pixel_xy_rgb(uint16_t x_coord, uint16_t y_coord, uint8_t red, ui
         if (bitplane_ix && (bitplane_ix <= s_lsb_msb_transition_bit))
         {
             // divide brightness in half for each bit below s_lsb_msb_transition_bit
-            int lsbBrightness = s_brightness >> (s_lsb_msb_transition_bit - bitplane_ix + 1);
+            int lsbBrightness = s_brightness_val >> (s_lsb_msb_transition_bit - bitplane_ix + 1);
             if (x_coord >= lsbBrightness)
             {
                 v |= BIT_OE; // for Brightness
@@ -816,7 +814,7 @@ void leddisplay_pixel_fill_rgb(uint8_t red, uint8_t green, uint8_t blue)
                 // turn off OE after brightness value is reached when displaying MSBs
                 // MSBs always output normal brightness
                 // LSB (!bitplane_ix) outputs normal brightness as MSB from previous row is being displayed
-                if ( ((bitplane_ix > s_lsb_msb_transition_bit) || !bitplane_ix) && (x_coord >= s_brightness) )
+                if ( ((bitplane_ix > s_lsb_msb_transition_bit) || !bitplane_ix) && (x_coord >= s_brightness_val) )
                 {
                     v |= BIT_OE; // For Brightness
                 }
@@ -825,7 +823,7 @@ void leddisplay_pixel_fill_rgb(uint8_t red, uint8_t green, uint8_t blue)
                 if (bitplane_ix && (bitplane_ix <= s_lsb_msb_transition_bit))
                 {
                     // divide brightness in half for each bit below s_lsb_msb_transition_bit
-                    int lsbBrightness = s_brightness >> (s_lsb_msb_transition_bit - bitplane_ix + 1);
+                    int lsbBrightness = s_brightness_val >> (s_lsb_msb_transition_bit - bitplane_ix + 1);
                     if (x_coord >= lsbBrightness) { v |= BIT_OE; } // For Brightness
                 }
 
@@ -943,7 +941,7 @@ void leddisplay_frame_update(leddisplay_frame_t *p_frame)
                 // turn off OE after brightness value is reached when displaying MSBs
                 // MSBs always output normal brightness
                 // LSB (!bitplane_ix) outputs normal brightness as MSB from previous row is being displayed
-                if ( ((bitplane_ix > s_lsb_msb_transition_bit) || !bitplane_ix) && (x_coord >= s_brightness) )
+                if ( ((bitplane_ix > s_lsb_msb_transition_bit) || !bitplane_ix) && (x_coord >= s_brightness_val) )
                 {
                     v |= BIT_OE; // For Brightness
                 }
@@ -952,7 +950,7 @@ void leddisplay_frame_update(leddisplay_frame_t *p_frame)
                 if (bitplane_ix && (bitplane_ix <= s_lsb_msb_transition_bit))
                 {
                     // divide brightness in half for each bit below s_lsb_msb_transition_bit
-                    int lsbBrightness = s_brightness >> (s_lsb_msb_transition_bit - bitplane_ix + 1);
+                    int lsbBrightness = s_brightness_val >> (s_lsb_msb_transition_bit - bitplane_ix + 1);
                     if (x_coord >= lsbBrightness) { v |= BIT_OE; } // For Brightness
                 }
 

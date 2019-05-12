@@ -1,6 +1,6 @@
 /*!
     \file
-    \brief LED display driver using I2S parallel mode (see \ref LEDDISPLAY)
+    \brief HUB75 LED display driver using I2S parallel mode (see \ref LEDDISPLAY)
 
     \defgroup LEDDISPLAY LEDDISPLAY
 
@@ -87,13 +87,14 @@ void leddisplay_shutdown(void);
 
 //! set global brightness level
 /*
-    \param[in] brightness  brightness level, range 0..#LEDDISPLAY_WIDTH
+    \param[in] brightness  global brightness level, range 0..100 [%]
+    \returns the previously set global brightness level
 */
-void leddisplay_set_brightness(int brightness);
+int leddisplay_set_brightness(int brightness);
 
 //! get global brightness levell
 /*!
-    \returns the currently set global brightness level
+    \returns the currently set global brightness level (0..100 [%])
 */
 int leddisplay_get_brightness(void);
 

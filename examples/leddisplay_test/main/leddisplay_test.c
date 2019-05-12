@@ -99,29 +99,29 @@ static void sLeddisplayTestTask(void *pParam)
         }
         sDumpMemInfo();
 
-
         /* ***** pixel based API ***************************************************************** */
-
-        leddisplay_set_brightness(LEDDISPLAY_WIDTH);
 
         INFO("ghosting test 1 (pixel)");
         {
+            const int oldBrightness = leddisplay_set_brightness(100);
             for (uint16_t x = 0; x < LEDDISPLAY_WIDTH; x++)
             {
                 leddisplay_pixel_xy_rgb(x, 0, 255, 255, 255);
             }
             leddisplay_pixel_update(0);
             osSleep(20 * delay);
-
+            leddisplay_set_brightness(oldBrightness);
         }
         INFO("ghosting test 2 (pixel)");
         {
+            const int oldBrightness = leddisplay_set_brightness(100);
             for (uint16_t xy = 0; xy < LEDDISPLAY_HEIGHT; xy++)
             {
                 leddisplay_pixel_xy_rgb(xy, xy, 255, 255, 255);
             }
             leddisplay_pixel_update(0);
             osSleep(20 * delay);
+            leddisplay_set_brightness(oldBrightness);
         }
 
         // -----------------------------------------------------------------------------------------
@@ -288,32 +288,31 @@ static void sLeddisplayTestTask(void *pParam)
         {
             const int oldBrightness = leddisplay_get_brightness();
             const int delta = 2;
-            int n = LEDDISPLAY_WIDTH * 2 / delta;
+            int n = 100 * 2 / delta;
             int aniFrame = 0;
             int brightness = 0;
             int dir = delta;
             while (n > 0)
             {
                 leddisplay_set_brightness(brightness);
-                sAnimNyan(NULL, 2*delay, aniFrame);
+                sAnimNyan(NULL, 2 * delay, aniFrame);
 
                 n--;
                 aniFrame++;
                 aniFrame %= 12;
 
                 brightness += dir;
-                if (brightness > LEDDISPLAY_WIDTH)
+                if (brightness >= 100)
                 {
                     dir = -delta;
                     brightness -= 2 * delta;
                 }
-                else if (brightness < 0)
+                else if (brightness <= 0)
                 {
                     dir = +delta;
                     brightness += 2 * delta;
                 }
             }
-            DEBUG("reset brightness");
             leddisplay_set_brightness(oldBrightness);
         }
 
@@ -322,23 +321,27 @@ static void sLeddisplayTestTask(void *pParam)
 
         INFO("ghosting test 1 (frame)");
         {
+            const int oldBrightness = leddisplay_set_brightness(100);
             leddisplay_frame_fill_rgb(&sDispFrame, 0, 0, 0);
             for (uint16_t x = 0; x < LEDDISPLAY_WIDTH; x++)
             {
                 leddisplay_frame_xy_rgb(&sDispFrame, x, 0, 255, 255, 255);
             }
             leddisplay_frame_update(&sDispFrame);
+            leddisplay_set_brightness(oldBrightness);
             osSleep(20 * delay);
         }
 
         INFO("ghosting test 2 (frame)");
         {
+            const int oldBrightness = leddisplay_set_brightness(100);
             leddisplay_frame_fill_rgb(&sDispFrame, 0, 0, 0);
             for (uint16_t xy = 0; xy < LEDDISPLAY_HEIGHT; xy++)
             {
                 leddisplay_frame_xy_rgb(&sDispFrame, xy, xy, 255, 255, 255);
             }
             leddisplay_frame_update(&sDispFrame);
+            leddisplay_set_brightness(oldBrightness);
             osSleep(20 * delay);
         }
 
@@ -406,7 +409,7 @@ static void sLeddisplayTestTask(void *pParam)
                     (which & 0x1) != 0 ? 'R' : '.',
                     (which & 0x2) != 0 ? 'G' : '.',
                     (which & 0x4) != 0 ? 'B' : '.');
-                for (int brightness = 1; brightness <= LEDDISPLAY_WIDTH; brightness++)
+                for (int brightness = 1; brightness <= 100; brightness++)
                 {
                     leddisplay_set_brightness(brightness);
                     for (uint16_t x = 0; x < LEDDISPLAY_WIDTH; x++)
@@ -542,32 +545,31 @@ static void sLeddisplayTestTask(void *pParam)
         {
             const int oldBrightness = leddisplay_get_brightness();
             const int delta = 2;
-            int n = LEDDISPLAY_WIDTH * 2 / delta;
+            int n = 100 * 2 / delta;
             int aniFrame = 0;
             int brightness = 0;
             int dir = delta;
             while (n > 0)
             {
                 leddisplay_set_brightness(brightness);
-                sAnimNyan(&sDispFrame, 2*delay, aniFrame);
+                sAnimNyan(&sDispFrame, 2 * delay, aniFrame);
 
                 n--;
                 aniFrame++;
                 aniFrame %= 12;
 
                 brightness += dir;
-                if (brightness > LEDDISPLAY_WIDTH)
+                if (brightness >= 100)
                 {
                     dir = -delta;
                     brightness -= 2 * delta;
                 }
-                else if (brightness < 0)
+                else if (brightness <= 0)
                 {
                     dir = +delta;
                     brightness += 2 * delta;
                 }
             }
-            DEBUG("reset brightness");
             leddisplay_set_brightness(oldBrightness);
         }
 
