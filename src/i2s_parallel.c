@@ -24,11 +24,17 @@
 
 #include <soc/i2s_struct.h>
 #include <soc/i2s_reg.h>
-#include <driver/periph_ctrl.h>
+#include <soc/gpio_periph.h>
 #include <soc/io_mux_reg.h>
-#include <rom/lldesc.h>
+
+#include <driver/periph_ctrl.h>
+#include <driver/gpio.h>
+
+#include <esp32/rom/lldesc.h>
+
 #include <esp_heap_caps.h>
 #include <esp_log.h>
+#include <esp_intr_alloc.h>
 
 #include "i2s_parallel.h"
 
