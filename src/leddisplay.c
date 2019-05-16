@@ -175,20 +175,30 @@
 /* *********************************************************************************************** */
 // configuration (see also leddisplay.h)
 
-#if CONFIG_LEDDISPLAY_TYPE_32X16_4SCAN     // not tested
+#if CONFIG_LEDDISPLAY_TYPE_32X16_4SCAN     // doesn't work
+#  error CONFIG_LEDDISPLAY_TYPE_32X16_4SCAN does not work
 #  define LEDDISPLAY_ROWS_IN_PARALLEL      4
-#elif CONFIG_LEDDISPLAY_TYPE_32X16_8SCAN   // not tested
+
+#elif CONFIG_LEDDISPLAY_TYPE_32X16_8SCAN   // tested, works
 #  define LEDDISPLAY_ROWS_IN_PARALLEL      2
-#elif CONFIG_LEDDISPLAY_TYPE_32X32_8SCAN   // not tested
+
+#elif CONFIG_LEDDISPLAY_TYPE_32X32_8SCAN   // doesn't work
+#  error CONFIG_LEDDISPLAY_TYPE_32X32_8SCAN does not work
 #  define LEDDISPLAY_ROWS_IN_PARALLEL      4
-#elif CONFIG_LEDDISPLAY_TYPE_32X32_16SCAN  // not tested
-#  define LEDDISPLAY_ROWS_IN_PARALLEL      4
-#elif CONFIG_LEDDISPLAY_TYPE_64X32_8SCAN   // not tested
-#  define LEDDISPLAY_ROWS_IN_PARALLEL      4
-#elif CONFIG_LEDDISPLAY_TYPE_64X32_16SCAN  // tested
+
+#elif CONFIG_LEDDISPLAY_TYPE_32X32_16SCAN  // tested, works
 #  define LEDDISPLAY_ROWS_IN_PARALLEL      2
+
+#elif CONFIG_LEDDISPLAY_TYPE_64X32_8SCAN   // doesn't work
+#  error CONFIG_LEDDISPLAY_TYPE_64X32_8SCAN does not work
+#  define LEDDISPLAY_ROWS_IN_PARALLEL      4
+
+#elif CONFIG_LEDDISPLAY_TYPE_64X32_16SCAN  // tested, works
+#  define LEDDISPLAY_ROWS_IN_PARALLEL      2
+
 #elif CONFIG_LEDDISPLAY_TYPE_64X64_32SCAN  // not tested
 #  define LEDDISPLAY_ROWS_IN_PARALLEL      2
+#  define LEDDISPLAY_NEED_E_GPIO 1
 #  if CONFIG_LEDDISPLAY_E_GPIO < 0
 #    error Need CONFIG_LEDDISPLAY_E_GPIO > 0!
 #  endif
@@ -211,8 +221,8 @@
 #define NUM_FRAME_BUFFERS         2
 //#define OE_OFF_CLKS_AFTER_LATCH   1
 #define COLOR_DEPTH_BITS          8
-#define PIXELS_PER_LATCH          ((LEDDISPLAY_WIDTH * LEDDISPLAY_HEIGHT) / LEDDISPLAY_HEIGHT) // 64*32/32 = 64
-#define ROWS_PER_FRAME            (LEDDISPLAY_HEIGHT / LEDDISPLAY_ROWS_IN_PARALLEL) // 32/2 = 16
+#define PIXELS_PER_LATCH          ((LEDDISPLAY_WIDTH * LEDDISPLAY_HEIGHT) / LEDDISPLAY_HEIGHT)
+#define ROWS_PER_FRAME            (LEDDISPLAY_HEIGHT / LEDDISPLAY_ROWS_IN_PARALLEL)
 
 /* *********************************************************************************************** */
 
@@ -293,7 +303,7 @@ esp_err_t leddisplay_init(void)
         " B="   STRINGIFY(CONFIG_LEDDISPLAY_B_GPIO)
         " C="   STRINGIFY(CONFIG_LEDDISPLAY_C_GPIO)
         " D="   STRINGIFY(CONFIG_LEDDISPLAY_D_GPIO)
-#if (CONFIG_LEDDISPLAY_E_GPIO > -1)
+#if LEDDISPLAY_NEED_E_GPIO
         " E="   STRINGIFY(CONFIG_LEDDISPLAY_E_GPIO)
 #endif
         " LAT=" STRINGIFY(CONFIG_LEDDISPLAY_LAT_GPIO)
@@ -317,10 +327,14 @@ esp_err_t leddisplay_init(void)
         // clear frame buffers
         else
         {
+            const int old_brightness = leddisplay_set_brightness(0);
+
             s_current_frame = 1;
             leddisplay_pixel_fill_rgb(0, 0, 0);
             s_current_frame = 0;
             leddisplay_pixel_fill_rgb(0, 0, 0);
+
+            leddisplay_set_brightness(old_brightness);
         }
     }
 
@@ -508,7 +522,7 @@ esp_err_t leddisplay_init(void)
                 CONFIG_LEDDISPLAY_B_GPIO,    //  9 BIT_B
                 CONFIG_LEDDISPLAY_C_GPIO,    // 10 BIT_C
                 CONFIG_LEDDISPLAY_D_GPIO,    // 11 BIT_D
-#if (CONFIG_LEDDISPLAY_E_GPIO > -1)
+#if LEDDISPLAY_NEED_E_GPIO
                 CONFIG_LEDDISPLAY_E_GPIO,    // 12 BIT_E
 #else
                 -1,
@@ -668,7 +682,7 @@ void leddisplay_pixel_xy_rgb(uint16_t x_coord, uint16_t y_coord, uint8_t red, ui
         if (gpioRowAddress & BIT(1)) { v |= BIT_B; } // 2
         if (gpioRowAddress & BIT(2)) { v |= BIT_C; } // 4
         if (gpioRowAddress & BIT(3)) { v |= BIT_D; } // 8
-#if (CONFIG_LEDDISPLAY_E_GPIO > -1)
+#if LEDDISPLAY_NEED_E_GPIO
         if (gpioRowAddress & BIT(4)) { v |= BIT_E; } // 16
 #endif
 
@@ -807,7 +821,7 @@ void leddisplay_pixel_fill_rgb(uint8_t red, uint8_t green, uint8_t blue)
                 if (gpioRowAddress & BIT(1)) { v |= BIT_B; } // 2
                 if (gpioRowAddress & BIT(2)) { v |= BIT_C; } // 4
                 if (gpioRowAddress & BIT(3)) { v |= BIT_D; } // 8
-#if (CONFIG_LEDDISPLAY_E_GPIO > -1)
+#if LEDDISPLAY_NEED_E_GPIO
                 if (gpioRowAddress & BIT(4)) { v |= BIT_E; } // 16
 #endif
                 // need to disable OE after latch to hide row transition
@@ -934,7 +948,7 @@ void leddisplay_frame_update(leddisplay_frame_t *p_frame)
                 if (gpioRowAddress & BIT(1)) { v |= BIT_B; } // 2
                 if (gpioRowAddress & BIT(2)) { v |= BIT_C; } // 4
                 if (gpioRowAddress & BIT(3)) { v |= BIT_D; } // 8
-#if (CONFIG_LEDDISPLAY_E_GPIO > -1)
+#if LEDDISPLAY_NEED_E_GPIO
                 if (gpioRowAddress & BIT(4)) { v |= BIT_E; } // 16
 #endif
                 // need to disable OE after latch to hide row transition

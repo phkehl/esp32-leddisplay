@@ -3,7 +3,10 @@
 ## Introduction
 
 This is a *leddisplay* component for the ESP-IDF [1] for ESP32. It can be used
-to drive HUB75 LED displays (a.k.a. "Px displays").
+to drive HUB75 LED displays (a.k.a. "Px displays"). It currently works with the
+following displays: 32x16 1/8 scan, 32x32 1/16 scan, 64x32 1/16 scan, and 64x64
+1/32 scan. It currently does not work with 32x16 1/4 scan, 32x32 1/8 scan, 64x32
+1/8 scan.
 
 See [leddisplay.h](include/leddisplay.h) for the API.
 
@@ -41,16 +44,37 @@ git submodule add -b master https://github.com/phkehl/esp32-leddisplay.git compo
 
 Configuration is available in `make menuconfig` in *Component config* -> *LED Display*.
 
-## Notes
+## Wiring
 
-- This has been tested with a 64x32 1/16 scan type display. It may or may not
-  work with other configurations.
+The HUB75 (HUB75E) pinout is as follows (male input socket on the back of the display):
+```
+                 ______
+                /     /|
+               +-----+ |
+            R1 | o o | |G1
+            B1 | o o | |(GND)
+            R2 |/o o | |G2
+            B2   o o | |(GND) E on HUB75E
+             A  /o o | |B
+             C | o o | |D
+           CLK | o o | |LAT(CH) (STB)
+    (BLANK) OE | o o |/ GND
+               +-----+
+```
+Note that sometimes R1/G1/B1/R2/B2/G2 are labelled R0/G0/B0/R1/B1/G1.
+
+
+## Notes
 
 - The code is relatively slow, in particular the pixel based API (`leddisplay_pixel_xy_rgb()`),
   so perhaps increase the CPU clock in sdkconfig (e.g. `CONFIG_ESP32_DEFAULT_CPU_FREQ_240=y`,
   `CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ=240`).
 
 ## See also
+
+Original discussion and demo of the concept this code uses in the ESP forum:
+
+- https://esp32.com/viewtopic.php?t=3188
 
 Some generic LED display stuff:
 

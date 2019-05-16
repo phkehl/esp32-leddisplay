@@ -6,20 +6,13 @@ menu "LED Display"
         help
             The LED display type.
 
-        config LEDDISPLAY_TYPE_32X16_4SCAN
-            bool "32x16 1/4 scan"
+        # these work:
 
         config LEDDISPLAY_TYPE_32X16_8SCAN
             bool "32x16 1/8 scan"
 
-        config LEDDISPLAY_TYPE_32X32_8SCAN
-            bool "32x32 1/8 scan"
-
         config LEDDISPLAY_TYPE_32X32_16SCAN
             bool "32x32 1/16 scan"
-
-        config LEDDISPLAY_TYPE_64X32_8SCAN
-            bool "64x32 1/8 scan"
 
         config LEDDISPLAY_TYPE_64X32_16SCAN
             bool "64x32 1/16 scan"
@@ -27,7 +20,18 @@ menu "LED Display"
         config LEDDISPLAY_TYPE_64X64_32SCAN
             bool "64x64 1/32 scan"
 
-        # what more exists, works?
+        # these don't work:
+        #
+        #config LEDDISPLAY_TYPE_32X16_4SCAN
+        #    bool "32x16 1/4 scan (doesn't work)
+        #
+        #config LEDDISPLAY_TYPE_32X32_8SCAN
+        #    bool "32x32 1/8 scan (doesn't work!)"
+        #
+        #config LEDDISPLAY_TYPE_64X32_8SCAN
+        #    bool "64x32 1/8 scan (doesn't work!)"
+
+        # what more exists?
 
     endchoice
 

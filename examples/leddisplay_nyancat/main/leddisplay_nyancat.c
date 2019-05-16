@@ -91,6 +91,7 @@ static void sLeddisplayTestTask(void *pParam)
             continue;
         }
         sDumpMemInfo();
+        osSleep(1000);
 
         // -----------------------------------------------------------------------------------------
 
