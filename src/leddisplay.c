@@ -176,21 +176,21 @@
 // configuration (see also leddisplay.h)
 
 #if CONFIG_LEDDISPLAY_TYPE_32X16_4SCAN     // doesn't work
-#  error CONFIG_LEDDISPLAY_TYPE_32X16_4SCAN does not work
+#  warning CONFIG_LEDDISPLAY_TYPE_32X16_4SCAN does not work
 #  define LEDDISPLAY_ROWS_IN_PARALLEL      4
 
 #elif CONFIG_LEDDISPLAY_TYPE_32X16_8SCAN   // tested, works
 #  define LEDDISPLAY_ROWS_IN_PARALLEL      2
 
 #elif CONFIG_LEDDISPLAY_TYPE_32X32_8SCAN   // doesn't work
-#  error CONFIG_LEDDISPLAY_TYPE_32X32_8SCAN does not work
+#  warning CONFIG_LEDDISPLAY_TYPE_32X32_8SCAN does not work
 #  define LEDDISPLAY_ROWS_IN_PARALLEL      4
 
 #elif CONFIG_LEDDISPLAY_TYPE_32X32_16SCAN  // tested, works
 #  define LEDDISPLAY_ROWS_IN_PARALLEL      2
 
 #elif CONFIG_LEDDISPLAY_TYPE_64X32_8SCAN   // doesn't work
-#  error CONFIG_LEDDISPLAY_TYPE_64X32_8SCAN does not work
+#  warning CONFIG_LEDDISPLAY_TYPE_64X32_8SCAN does not work
 #  define LEDDISPLAY_ROWS_IN_PARALLEL      4
 
 #elif CONFIG_LEDDISPLAY_TYPE_64X32_16SCAN  // tested, works

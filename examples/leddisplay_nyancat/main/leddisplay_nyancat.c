@@ -189,12 +189,13 @@ static void sAnimNyan(leddisplay_frame_t *p_frame, uint32_t delay, int frame)
     // clear display
     leddisplay_pixel_fill_rgb(0, 0, 0);
 
-    const uint16_t x_max = LEDDISPLAY_WIDTH  < 64 ? LEDDISPLAY_WIDTH  : 64;
-    const uint16_t y_max = LEDDISPLAY_HEIGHT < 32 ? LEDDISPLAY_HEIGHT : 32;
-
     // which frames to play?
     int startFrame = (frame < 0) || (frame >= nFrames) ? 0             : frame;
     int endFrame   = (frame < 0) || (frame >= nFrames) ? (nFrames - 1) : frame;
+
+    // offset animation if display is smaller than the animation
+    const int16_t nxOffs = LEDDISPLAY_WIDTH  < 64 ? (64 - LEDDISPLAY_WIDTH)  / 2 : 0;
+    const int16_t nyOffs = LEDDISPLAY_HEIGHT < 32 ? (32 - LEDDISPLAY_HEIGHT) / 2 : 0;
 
     // play each frame
     uint32_t prevTick = xTaskGetTickCount();
@@ -206,11 +207,11 @@ static void sAnimNyan(leddisplay_frame_t *p_frame, uint32_t delay, int frame)
         // pixel based
         if (p_frame == NULL)
          {
-            for (uint16_t x = 0; x < x_max; x++)
+            for (uint16_t x = 0; x < LEDDISPLAY_WIDTH; x++)
             {
-                for (uint16_t y = 0; y < y_max; y++)
+                for (uint16_t y = 0; y < LEDDISPLAY_HEIGHT; y++)
                 {
-                    const uint8_t *rgb = data->yx[y][x];
+                    const uint8_t *rgb = data->yx[(nyOffs + y) % 32][(nxOffs + x) % 64];
                     leddisplay_pixel_xy_rgb(x, y, rgb[0], rgb[1], rgb[2]);
                 }
             }
@@ -218,11 +219,11 @@ static void sAnimNyan(leddisplay_frame_t *p_frame, uint32_t delay, int frame)
         // frame based
         else
         {
-            for (uint16_t x = 0; x < x_max; x++)
+            for (uint16_t x = 0; x < LEDDISPLAY_WIDTH; x++)
             {
-                for (uint16_t y = 0; y < y_max; y++)
+                for (uint16_t y = 0; y < LEDDISPLAY_HEIGHT; y++)
                 {
-                    const uint8_t *rgb = data->yx[y][x];
+                    const uint8_t *rgb = data->yx[(nyOffs + y) % 32][(nxOffs + x) % 64];
                     leddisplay_frame_xy_rgb(p_frame, x, y, rgb[0], rgb[1], rgb[2]);
                 }
             }
