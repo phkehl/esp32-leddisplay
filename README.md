@@ -70,6 +70,8 @@ Note that sometimes R1/G1/B1/R2/B2/G2 are labelled R0/G0/B0/R1/B1/G1.
   so perhaps increase the CPU clock in sdkconfig (e.g. `CONFIG_ESP32_DEFAULT_CPU_FREQ_240=y`,
   `CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ=240`).
 
+- Tested with esp-idf v3.2.
+
 ## See also
 
 Original discussion and demo of the concept this code uses in the ESP forum:

@@ -5,7 +5,7 @@
 
 #include <esp_err.h>
 #include <soc/i2s_struct.h>
-#include <esp32/rom/lldesc.h>
+#include <rom/lldesc.h>
 
 typedef enum {
     I2S_PARALLEL_BITS_8  =  8, // BUG: Doesn't work.

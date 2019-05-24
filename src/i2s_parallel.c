@@ -30,7 +30,7 @@
 #include <driver/periph_ctrl.h>
 #include <driver/gpio.h>
 
-#include <esp32/rom/lldesc.h>
+#include <rom/lldesc.h>
 
 #include <esp_heap_caps.h>
 #include <esp_log.h>
