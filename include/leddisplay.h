@@ -224,12 +224,9 @@ void leddisplay_frame_clear(leddisplay_frame_t *p_frame);
     #LEDDISPLAY_HEIGHT * 3. This will block as necessary until the frame buffer memory
     becomes available.
 
-    \param[in,out] frame  RGB data for one frame, or NULL to clear the display
-
-    \note The function will modify the frame memory and you will have to draw the next frame fully
-          from scratch.
+    \param[in] frame  RGB data for one frame
 */
-void leddisplay_frame_update(leddisplay_frame_t *p_frame);
+void leddisplay_frame_update(const leddisplay_frame_t *p_frame);
 
 //@}
 

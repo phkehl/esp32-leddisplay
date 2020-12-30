@@ -106,7 +106,7 @@ static const uint8_t sLumLut[256] =
 #  endif
 };
 
-uint8_t val2pwm(const uint8_t val)
+inline uint8_t val2pwm(const uint8_t val)
 {
     return sLumLut[val];
 }

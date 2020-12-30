@@ -904,7 +904,13 @@ inline void leddisplay_frame_clear(leddisplay_frame_t *p_frame)
     memset(p_frame, 0, sizeof(*p_frame));
 }
 
-void leddisplay_frame_update(leddisplay_frame_t *p_frame)
+#if CONFIG_LEDDISPLAY_CORR_BRIGHT_STRICT || CONFIG_LEDDISPLAY_CORR_BRIGHT_MODIFIED
+#  define _VAL2PWM(v) val2pwm(v)
+#else
+#  define _VAL2PWM(v) (v)
+#endif
+
+void leddisplay_frame_update(const leddisplay_frame_t *p_frame)
 {
     // if necessary, block until current framebuffer memory becomes available
     xSemaphoreTake(s_shift_complete_sem, portMAX_DELAY);
@@ -915,16 +921,10 @@ void leddisplay_frame_update(leddisplay_frame_t *p_frame)
         for (uint16_t y = 0; y < LEDDISPLAY_HEIGHT; y++)
         {
             const uint8_t *p_rgb = p_frame->yx[y][x];
-            leddisplay_pixel_xy_rgb(x, y, p_rgb[0], p_rgb[1], p_rgb[2]);
+            leddisplay_pixel_xy_rgb(x, y, _VAL2PWM(p_rgb[0]), _VAL2PWM(p_rgb[1]), _VAL2PWM(p_rgb[2]));
         }
     }
 #else
-#if CONFIG_LEDDISPLAY_CORR_BRIGHT_STRICT || CONFIG_LEDDISPLAY_CORR_BRIGHT_MODIFIED
-    for (uint16_t ix = 0; ix < NUMOF(p_frame->raw); ix++)
-    {
-        p_frame->raw[ix] = val2pwm(p_frame->raw[ix]);
-    }
-#endif
     for (unsigned int y_coord = 0; y_coord < ROWS_PER_FRAME; y_coord++) // half height - 16 iterations
     {
         row_data_t *row_data = &s_frames[s_current_frame].rowdata[y_coord];
@@ -976,15 +976,15 @@ void leddisplay_frame_update(leddisplay_frame_t *p_frame)
 
                 // top half
                 const uint8_t *p_rgb_top = p_frame->yx[y_coord][x_coord];
-                if (p_rgb_top[0] & mask) { v |= BIT_R1; }
-                if (p_rgb_top[1] & mask) { v |= BIT_G1; }
-                if (p_rgb_top[2] & mask) { v |= BIT_B1; }
+                if (_VAL2PWM(p_rgb_top[0]) & mask) { v |= BIT_R1; }
+                if (_VAL2PWM(p_rgb_top[1]) & mask) { v |= BIT_G1; }
+                if (_VAL2PWM(p_rgb_top[2]) & mask) { v |= BIT_B1; }
 
                 // bottom half
                 const uint8_t *p_rgb_bot = p_frame->yx[y_coord + ROWS_PER_FRAME][x_coord];
-                if (p_rgb_bot[0] & mask) { v |= BIT_R2; }
-                if (p_rgb_bot[1] & mask) { v |= BIT_G2; }
-                if (p_rgb_bot[2] & mask) { v |= BIT_B2; }
+                if (_VAL2PWM(p_rgb_bot[0]) & mask) { v |= BIT_R2; }
+                if (_VAL2PWM(p_rgb_bot[1]) & mask) { v |= BIT_G2; }
+                if (_VAL2PWM(p_rgb_bot[2]) & mask) { v |= BIT_B2; }
 
                 // 16 bit parallel mode
                 // Save the calculated value to the bitplane memory in reverse order to account for I2S Tx FIFO mode1 ordering
